@@ -2,7 +2,7 @@
 
 [![cpp-version](https://img.shields.io/badge/language-C%2B%2B-blue)](https://isocpp.org/) [![cpp-version](https://img.shields.io/github/license/ElwinCabrera/ds-algos)](https://opensource.org/licenses/BSD-3-Clause)
 
-This repository was created for me to better understand and reinforce computer science fundamentals in data structures and algorithms. This project has two main goals. First, is to go over all of the core and important data structures and algorithms used in computer science. The second goal is to have at least 20 practice exercises per category in data structures and in algorithms. I hope you find this repository useful and informative as well.
+This repository was created for me to better understand and reinforce computer science fundamentals in data structures and algorithms. This project has two main goals. First, is to go over all of the core and important data structures and algorithms used in computer science. The second goal is to have at least 15 practice exercises per category in data structures and in algorithms. I hope you find this repository useful and informative as well.
 
 ## Folder Structure Conventions
 
@@ -52,12 +52,9 @@ When using this resource it is best to start with going over some core concepts 
 ### Data Structures
 - [x] [Arrays and Strings](ds-algos/data-structures/arrays-strings/README.md)
 - [ ] [Lists](ds-algos/data-structures/lists/README.md)
-- [ ] [Stacks]()
-- [ ] [Queues]()
-- [ ] [Graphs]()
-- [ ] [Trees and Tries]()
+- [ ] [Stacks and Queues](ds-algos/data-structures/stacks-queues/README.md)
+- [ ] [Graphs and Trees]()
 - [ ] [Hash Tables]()
-- [ ] [Heap]()
 
 ### Algorithms
 
@@ -76,7 +73,7 @@ When using this resource it is best to start with going over some core concepts 
 - [ ] [Breath First Search (BFS)]()
 - [ ] [Depth First Search (DFS)]() 
 
-#### Every other algorithm 
+#### Other useful algorithms to know 
 - [ ] [Shortest Path in Maze (Lee algorithm)]()
 - [ ] [Flood Fill]()
 - [ ] [Prorder Traversal]()
@@ -89,7 +86,11 @@ When using this resource it is best to start with going over some core concepts 
 - [ ] [Minimum Spanning Tree (Kruskal's algorithm)]()
 - [ ] [Single-Source Shortest Path (Dijkstra's algorithm)]()
 - [ ] [All-Pairs Shortest Paths (Floyd Warshall Algorithm)]()
+- [ ] [Backtracking Algorithms]()
 
 
 ## Licence 
 
+This Project is under the BSD 3-Clause licence.
+
+It is 100% free for personal and commercial use.
