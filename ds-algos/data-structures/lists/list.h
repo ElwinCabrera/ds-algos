@@ -435,26 +435,33 @@ public:
         Node<Type> *node_ptr = *(this->begin());
         Node<Type> *other_node_ptr = *(other.begin());
         
-        while (node_ptr != this->last_node && 
-              other_node_ptr != *(other.end())){
+        while (node_ptr != this->last_node && other_node_ptr != *(other.end())){
             
             if(other_node_ptr->data <= node_ptr->data){
-                Node<Type> *other_target_prev =  other_node_ptr->prev_node;
-                other_target_prev->next_node = other_node_ptr->next_node;
-                other_node_ptr->next_node->prev_node = other_target_prev;
+                Node<Type> *save_other_next = other_node_ptr->next_node;
+                other_node_ptr->prev_node->next_node = other_node_ptr->next_node;
+                other_node_ptr->next_node->prev_node = other_node_ptr->prev_node;
 
-                Node<Type> *this_insert_prev = node_ptr->prev_node;
-                this_insert_prev->next_node = other_node_ptr;
-                other_node_ptr->prev_node = this_insert_prev;
-                other_node_ptr->next_node = node_ptr; 
-            } 
-            node_ptr = node_ptr->next_node;
+                other_node_ptr->prev_node = node_ptr->prev_node;
+                node_ptr->prev_node->next_node = other_node_ptr;
+                other_node_ptr->next_node = node_ptr;
+                node_ptr->prev_node = other_node_ptr;
+
+                other_node_ptr = save_other_next;
+            } else node_ptr = node_ptr->next_node;
         }
-        // if(other_node_ptr != *(other.end())) {
-        //     node_ptr->next_node =  other_node_ptr->next_node;
-        //     other_node_ptr->next_node = this->last_node;
-        //     this->last_node = *(other.end()); 
-        // }
+        if(other_node_ptr != *(other.end())) {
+            Node<Type> *other_prev_from_target = other_node_ptr->prev_node;
+            other_prev_from_target->next_node = *(other.end()); // fixing others link to point to last 
+            //
+            
+            Node<Type> *this_prev_from_curr = node_ptr->prev_node;
+            this_prev_from_curr->next_node = other_node_ptr;
+            other_node_ptr->prev_node = this_prev_from_curr;
+            this->last_node->prev_node = (other.end())->prev_node;
+            (other.end())->prev_node->next_node = this->last_node;
+            (other.end())->prev_node = other_prev_from_target;
+        }
 
         
         
