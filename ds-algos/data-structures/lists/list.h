@@ -8,32 +8,33 @@
 #include <climits>
 #include <math.h>
 #include <vector>
+#include <stack>
 
-template< class Type, class UnqualifiedType > class Bidir_Iterator;
-template<class Type, class UnqualifiedType  > class List;
+template< class Type> class Bidir_Iterator;
+template<class Type > class List;
 
-template <class Type, class UnqualifiedType = std::remove_cv_t<Type>> 
+template <class Type> 
 class Node 
 {
 public:
     Node(): data(0), next_node(0), prev_node(0) {}
-    Node(const UnqualifiedType &value, Node<Type> *ptr= nullptr): data(value), next_node(0) {}
+    Node(const Type &value, Node<Type> *ptr= nullptr): data(value), next_node(0) {}
     
-    UnqualifiedType  data;
+    Type  data;
     Node<Type> *next_node;
     Node<Type> *prev_node;
 
-    friend class List<Type, UnqualifiedType>;
-    friend class Bidir_Iterator<Type, UnqualifiedType>;
+    friend class List<Type>;
+    friend class Bidir_Iterator<Type>;
 };
 
-template< class Type, class UnqualifiedType = std::remove_cv_t<Type> >
+template< class Type>
 class Bidir_Iterator
 {
 public:
-    using value_type = UnqualifiedType;
-    using pointer    = UnqualifiedType*;
-    using reference  = UnqualifiedType&;
+    using value_type = Type;
+    using pointer    = Type*;
+    using reference  = Type&;
     using difference_type = std::ptrdiff_t;
     using iterator_category = std::random_access_iterator_tag;
 
@@ -140,12 +141,17 @@ private:
 };
 
 
-template<class Type, class UnqualifiedType = std::remove_cv_t<Type> >
+template<class Type >
 class List{
 public:
+    using value_type = Type;
+    using pointer    = Type*;
+    using reference  = Type&;
+    using const_reference  = const Type&;
+    using size_type  = size_t;
 
-    typedef Bidir_Iterator<UnqualifiedType> iterator;
-    typedef const  Bidir_Iterator<UnqualifiedType> const_iterator;
+    typedef Bidir_Iterator<value_type> iterator;
+    typedef const  Bidir_Iterator<value_type> const_iterator;
     
     List()
     : first_node(new Node<Type>()), last_node(new Node<Type>()) ,listSize(0) {
@@ -153,7 +159,7 @@ public:
         this->last_node->prev_node = this->first_node;
     }
 
-    List(unsigned count, const UnqualifiedType & value)
+    List(size_type count, const Type &value)
     : first_node(new Node<Type>()), last_node(new Node<Type>()), listSize(count){
         Node<Type> *node_ptr = this->first_node;
         while(count ) {
@@ -167,7 +173,7 @@ public:
         this->last_node->prev_node = node_ptr; 
     }
 
-    List(unsigned count)
+    List(size_type count)
     : first_node(new Node<Type>()), last_node(new Node<Type>()), listSize(count) {
         Node<Type> *node_ptr = this->first_node;
         while(count ) {
@@ -229,25 +235,25 @@ public:
 
         }
     }
-    List<UnqualifiedType >& operator=(const List<Type>& other){
+    List& operator=(const List &other){
         List<Type> tmp(other);
         tmp.swap(*this);
         return *this;
     }
 
-    List<Type>& operator=(const List<Type>&& other) {
+    List& operator=(const List &&other) {
 
     }
 
-    void assign(unsigned count, const UnqualifiedType& value){ this->resize(count, value); }
+    void assign(size_type count, const Type &value){ this->resize(count, value); }
 
     
 
     //element access
-    UnqualifiedType& front() {return  this->begin()->data;}
-    const UnqualifiedType& front() const {return  this->begin()->data;}
-    UnqualifiedType& back() {return  (this->end()-1)->data;}
-    const UnqualifiedType& back() const {return  (this->begin()-1)->data;}
+    reference front() {return  this->begin()->data;}
+    const_reference front() const {return  this->begin()->data;}
+    reference back() {return  (this->end()-1)->data;}
+    const_reference back() const {return  (this->begin()-1)->data;}
     
     // iterators
     
@@ -260,9 +266,9 @@ public:
     const_iterator cend() const noexcept{return const_iterator(last_node);}
     
     //capacity
-    unsigned empty() const {return listSize == 0;}
-    unsigned size() const {return this->listSize;}
-    unsigned max_size() const {return UINT_MAX;}
+    size_type empty() const {return listSize == 0;}
+    size_type size() const {return this->listSize;}
+    size_type max_size() const {return UINT_MAX;}
 
     // modifiers
     void clear() noexcept{
@@ -284,7 +290,7 @@ public:
         this->first_node->next_node = this->last_node;
         this->last_node->prev_node = this->first_node;
     }
-    iterator insert(const_iterator pos, const UnqualifiedType &value) {
+    iterator insert(const_iterator pos, const Type &value) {
         if(*pos == this->first_node) return this->begin();
         Node<Type> *new_node = new Node<Type>(value);
         Node<Type> *prev_insert_node = pos->prev_node;
@@ -295,15 +301,15 @@ public:
         ++this->listSize;
         return iterator(new_node);
     }
-    iterator insert(const_iterator pos, const UnqualifiedType &&value){
-        const UnqualifiedType v = std::move(value);
+    iterator insert(const_iterator pos, const Type &&value){
+        const Type v = std::move(value);
         return insert(pos, v);
     }
-    iterator insert(const_iterator pos, unsigned count, const UnqualifiedType &value){
+    iterator insert(const_iterator pos, size_type count, const Type &value){
         if(count == 0 || *pos == this->first_node) return pos;
         iterator saveStart = pos-1;
         iterator it = pos;
-        for(unsigned i = 0; i < count; ++i) it = insert(it, value);
+        for(size_type i = 0; i < count; ++i) it = insert(it, value);
         return saveStart+1;
     }
 
@@ -341,7 +347,7 @@ public:
         return last;
     }
 
-    void push_back(const UnqualifiedType &value){
+    void push_back(const Type &value){
         Node<Type> *new_node = new Node<Type>(value);
         Node<Type> *prev_last = this->last_node->prev_node;
         prev_last->next_node = new_node;
@@ -350,8 +356,8 @@ public:
         this->last_node->prev_node = new_node;
         ++this->listSize;
     }
-    void push_back(UnqualifiedType &&value){
-        UnqualifiedType v= std::move(value);
+    void push_back(Type &&value){
+        Type v= std::move(value);
         push_back(v);
     }
 
@@ -367,7 +373,7 @@ public:
     }
     
 
-    void push_front(const UnqualifiedType & value){
+    void push_front(const Type &value){
         Node<Type> *node = new Node<Type>(value);
         node->next_node = this->first_node->next_node;
         node->prev_node = this->first_node;
@@ -375,8 +381,8 @@ public:
         ++this->listSize;
     }
 
-    void push_front(UnqualifiedType && value){
-        UnqualifiedType v= std::move(value);
+    void push_front(Type &&value){
+        Type v= std::move(value);
         push_front(v);
     }
 
@@ -394,10 +400,10 @@ public:
             --this->listSize;
         }
     }
-    void resize(unsigned count) {
+    void resize(size_type count) {
         
         
-        unsigned c = 0;
+        size_type c = 0;
         if(count > this->listSize){
             c = count - this->listSize;
             while(c--) this->insert(this->end(),0);
@@ -409,9 +415,9 @@ public:
         }
         this->listSize = count;
     }
-    void resize(unsigned count, const UnqualifiedType & value){
+    void resize(size_type count, const Type &value){
         
-        unsigned c = 0;
+        size_type c = 0;
         if(count > this->listSize){
             c = count - this->listSize;
             while(c--) this->insert(this->end(),value);
@@ -423,14 +429,14 @@ public:
         }
         this->listSize = count;
     }
-    void swap(List<Type>& other) noexcept{
+    void swap(List &other) noexcept{
         using std::swap;
         swap(this->listSize, other.listSize);
         swap(this->first_node, other.first_node);
     }
 
     //operations
-    void merge(List<Type>& other){
+    void merge(List &other){
         if(other.empty() || other == *this) return;
         Node<Type> *node_ptr = *(this->begin());
         Node<Type> *other_node_ptr = *(other.begin());
@@ -466,7 +472,7 @@ public:
         
         
     }
-    void merge(List<Type>&& other){
+    void merge(List &&other){
         List l(std::move(other));
         merge(l);
     }
@@ -474,7 +480,7 @@ public:
     // void merge( List& other, Compare comp );
     // template <class Compare>
     // void merge( List&& other, Compare comp );
-    void splice(iterator pos, List<Type> &other){
+    void splice(iterator pos, List &other){
         if(other.empty() || other == *this) return;
         Node<Type> *right_end = *pos;
         Node<Type> *left_end = *(pos-1);
@@ -492,11 +498,11 @@ public:
         this->listSize += other.size();
         
     }
-    void splice(iterator pos, List<Type> &&other){
+    void splice(iterator pos, List &&other){
         List l(std::move(other));
         splice(pos, l);
     }
-    void splice(iterator pos, List<Type> &other, iterator it){
+    void splice(iterator pos, List &other, iterator it){
         if(other.empty() || other == *this) return;
         Node<Type> *right_end = *pos;
         Node<Type> *left_end = *(pos-1);
@@ -517,11 +523,11 @@ public:
         //just for the size, then again we need to have the correct size
         //this->listSize += other.size();
     }
-    void splice(iterator pos, List<Type> &&other, iterator it){
+    void splice(iterator pos, List &&other, iterator it){
         List l(std::move(other));
         splice(pos, l, it);
     }
-    void splice(iterator pos, List<Type> &other, iterator first, iterator last){
+    void splice(iterator pos, List &other, iterator first, iterator last){
         if(other.empty() || other == *this) return;
         Node<Type> *right_end = *pos;
         Node<Type> *left_end = *(pos-1);
@@ -542,13 +548,13 @@ public:
         //just for the size, then again we need to have the correct size
         //this->listSize += other.size();
     }
-    void splice(iterator pos, List<Type> &&other, iterator first, iterator last){
+    void splice(iterator pos, List &&other, iterator first, iterator last){
         List l(std::move(other));
         splice(pos, l, first, last);
     }
 
-    unsigned remove(const UnqualifiedType & value){
-        unsigned count = 0;
+    size_type remove(const Type &value){
+        size_type count = 0;
         Node<Type> *node_ptr = *(this->begin()); 
         while( node_ptr != this->last_node){
             if(node_ptr->data == value){ erase(iterator(node_ptr)); ++count; }
@@ -574,8 +580,8 @@ public:
         this->first_node =  last_node;
         last_node = tmp;
     }
-    unsigned unique(){
-        unsigned count =0;
+    size_type unique(){
+        size_type count =0;
         Node<Type> *node_ptr = *(this->begin());
         
         while(node_ptr != this->last_node){
@@ -588,10 +594,10 @@ public:
     void sort(){
         std::vector<Type> v(this->listSize);
         iterator it = this->begin();
-        for(unsigned i =0; i < v.size() && it != this->end(); ++i) {v.at(i) = it->data; ++it;}
+        for(size_type i =0; i < v.size() && it != this->end(); ++i) {v.at(i) = it->data; ++it;}
         std::sort(v.begin(), v.end());
         Node<Type> *node_ptr = this->first_node->next_node;
-        unsigned i = 0;
+        size_type i = 0;
         while(node_ptr != this->last_node && i < v.size()) {node_ptr->data = v.at(i++); node_ptr = node_ptr->next_node;} 
     }
     // template< class Compare >
@@ -632,7 +638,7 @@ public:
 protected:
     Node<Type> *first_node;
     Node<Type> *last_node;
-    unsigned listSize;
+    size_type listSize;
     
 };
 
