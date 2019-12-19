@@ -274,7 +274,7 @@ public:
     void clear() noexcept{
         
         if(this->first_node){
-            if(this->first_node->next_node = this->last_node) return;
+            if(this->first_node->next_node == this->last_node) return;
             Node<Type> *node_ptr = this->first_node;
             
             while(node_ptr ) {

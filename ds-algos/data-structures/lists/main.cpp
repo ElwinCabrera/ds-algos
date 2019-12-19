@@ -47,27 +47,30 @@ int main(int argc, char **argv){
     // list1.push_back(1);
     // list1.push_back(1);
     // list1.push_back(2);
-     list1.push_back(1);
-    list1.push_back(2);
-    list1.push_back(3);
-    list1.push_back(4);
+
     list1.push_back(5);
+    list1.push_back(4);
+    list1.push_back(3);
+    list1.push_back(2);
+    list1.push_back(1);
+
+
     
-    //list1.push_front(100);
-     std::cout << "The list1 holds: " << list1 << "\n";
-     std::cout << "The list2 holds: " << list2 << "\n";
-    // list1.erase(list1.begin()+4);
-    // list1.insert(list1.begin()+4,5);
-    // std::cout << "The list after insert: " << list1 << "\n";
-    // list1.erase(list1.begin()+4, list1.begin()+7);
-    // std::cout << "The list after erase: " << list1 << "\n";
-    // list1.pop_back();
-    // std::cout << "The list after pop_back: " << list1 << "\n";
+    list1.push_front(100);
+    std::cout << "The list1 holds: " << list1 << "\n";
+    std::cout << "The list2 holds: " << list2 << "\n";
+    //list1.erase(list1.begin()+4);
+    //list1.insert(list1.begin()+4,5);
+    //std::cout << "The list after insert: " << list1 << "\n";
+    //list1.erase(list1.begin()+4, list1.begin()+7);
+    //std::cout << "The list after erase: " << list1 << "\n";
+    //list1.pop_back();
+    //std::cout << "The list after pop_back: " << list1 << "\n";
     // list1.pop_front();
     // std::cout << "The list after pop_back: " << list1 << "\n";
-    // list1.sort();
-    // std::cout << "The list after sort: " << list1 << "\n";
-    // list1.reverse();
+    //list1.sort();
+    //std::cout << "The list after sort: " << list1 << "\n";
+    //list1.reverse();
 
     //list1.unique();
     //std::cout << "The list unique: " << list1 << "\n";
@@ -77,8 +80,8 @@ int main(int argc, char **argv){
 
     list1.sort();
     list2.sort();
-    //std::cout << "The list1 sort: " << list1 << "\n";
-    //std::cout << "The list2 sort: " << list2 << "\n";
+    std::cout << "The list1 sort: " << list1 << "\n";
+    std::cout << "The list2 sort: " << list2 << "\n";
 
     list1.merge(list2);
     std::cout << "The list1 merge: " << list1 << "\n";

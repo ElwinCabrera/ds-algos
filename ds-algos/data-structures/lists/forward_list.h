@@ -268,14 +268,15 @@ public:
         first_node->next_node = last_node;
     }
     iterator insert_after(const_iterator pos, const UnqualifiedType &value) {
-        iterator p = pos;
-        Node<Type> *node = new Node<Type>(value);
-        if(next != this->end()){
-            p->next_node = node;
-            node->next_node = *next;
+        Node<Type> *before_insert = *pos;
+        Node<Type> *after_insert = *(pos+1);
+        Node<Type> *new_node = new Node<Type>(value);
+        if(after_insert != this->last_node){
+            before_insert->next_node = new_node;
+            new_node->next_node = after_insert;
         } else {
-            p->next_node = node;
-            node->next_node = last_node;
+            before_insert->next_node = new_node;
+            new_node->next_node = last_node;
         }
         ++this->size;
         return pos+1;
@@ -494,7 +495,7 @@ public:
         unsigned count = 0;
         Node<Type> *node_ptr = *(this->begin());
         while(node_ptr->next_node != this->last_node){
-            if(node_ptr->next_node->data == node_ptr->data) {erase_after(iterator(node_ptr)) ++count;}
+            if(node_ptr->next_node->data == node_ptr->data) {erase_after(iterator(node_ptr)); ++count;}
             node_ptr = node_ptr->next_node;
         }
         this->size -= count;
