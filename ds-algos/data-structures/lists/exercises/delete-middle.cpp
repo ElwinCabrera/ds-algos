@@ -1,8 +1,9 @@
 #include "../forward_list.h"
 
-void deleteNode(Node<int> *head, Node<int> *deleteMe){
-    while (head->next_node != deleteMe) head = head->next_node;
-    head->next_node = deleteMe->next_node;
-    delete deleteMe;
-    deleteMe = nullptr;
+void deleteNode(Node<int> *removeMe){
+    removeMe->data = removeMe->next_node->data;
+    Node<int> *trash = removeMe->next_node;
+    removeMe->next_node = trash->next_node;
+    delete trash;
+    trash = nullptr;
 }
