@@ -2,7 +2,7 @@
 #include<vector>
 using std::vector;
 
-void reverseList(Node<int> *head){
+void reverseList1(Node<int> *head){
     vector<int> v;
     Node<int> *head_ptr = head;
     while(head_ptr){
@@ -16,7 +16,7 @@ void reverseList(Node<int> *head){
     }
 }
 
-void reverseList(Node<int> *head){
+void reverseList2(Node<int> *head){
     Node<int> *before_begin = nullptr;
     Node<int> *begin = head;
     Node<int> *after_begin = head->next_node;

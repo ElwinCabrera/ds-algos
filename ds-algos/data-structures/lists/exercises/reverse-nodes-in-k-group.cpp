@@ -77,6 +77,13 @@ Node<int>* reverseList(Node<int> *begin, int num){
     return before_start;
 }
 
+
+
+
+
+
+
+/************** Test **************/
 void printList(Node<int> *ptr){
     //Node<int> *ptr = list;
     std::cout <<"List contains: [";
@@ -89,9 +96,6 @@ void printList(Node<int> *ptr){
 }
 
 
-
-
-/************** Test **************/
 int main(int argc, char **argv){
     
     Node<int> *list = new Node<int>(1);
