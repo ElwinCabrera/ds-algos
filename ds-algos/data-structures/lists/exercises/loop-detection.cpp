@@ -47,6 +47,18 @@ int main(int argc, char **argv){
     std::cout << "function return beginning of the list is: "<<start->data<< "\n";
     bool same = start == beginingCycle;
     std::cout << "pointing to same node: " << same << "\n";
+
+    delete head->next_node->next_node->next_node->next_node->next_node->next_node->next_node->next_node;
+    delete head->next_node->next_node->next_node->next_node->next_node->next_node->next_node;
+    delete head->next_node->next_node->next_node->next_node->next_node->next_node;
+    delete head->next_node->next_node->next_node->next_node->next_node;
+    delete head->next_node->next_node->next_node->next_node;
+    delete head->next_node->next_node->next_node;
+    delete head->next_node->next_node;
+    delete head->next_node;
+    delete beginingCycle;
+    delete head;
+    
     
 
 }
