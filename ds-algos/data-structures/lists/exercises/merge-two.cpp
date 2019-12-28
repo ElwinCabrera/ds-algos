@@ -7,7 +7,7 @@ merged:  0 1 2 3 4 5 6 7 8 9
 Node<int>* merge(Node<int> *head1, Node<int> *head2){
     if(head1 && !head2) return head1;
     if(head2 && !head1) return head2;
-    Node<int> *new_head = head1;
+    
     Node<int> *node_ptr1 = new Node<int>(-1000); // dummy node
     Node<int> *node_ptr2 = new Node<int>(-1000); // dummy node
     node_ptr1->next_node = head1;
@@ -16,7 +16,6 @@ Node<int>* merge(Node<int> *head1, Node<int> *head2){
     Node<int> *trash2 = node_ptr2;
 
     while(node_ptr1->next_node && node_ptr2->next_node){
-        if(node_ptr2->next_node->data <= new_head->data) new_head = node_ptr2->next_node;
         if(node_ptr1->next_node->data >= node_ptr2->next_node->data){
             Node<int> *insert = node_ptr2->next_node;
 
@@ -30,10 +29,10 @@ Node<int>* merge(Node<int> *head1, Node<int> *head2){
     if(node_ptr2->next_node && !node_ptr1->next_node) node_ptr1->next_node = node_ptr2->next_node;
     
     
-
+    Node<int> *result_head = trash1->next_node;
     delete trash1;
     delete trash2;
-    return new_head;
+    return result_head;
 }
 
 
