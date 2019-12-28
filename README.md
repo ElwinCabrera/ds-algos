@@ -51,7 +51,7 @@ When using this resource it is best to start with going over some core concepts 
 
 ### Data Structures
 - [x] [Arrays and Strings](ds-algos/data-structures/arrays-strings/README.md)
-- [ ] [Lists](ds-algos/data-structures/lists/README.md)
+- [x] [Lists](ds-algos/data-structures/lists/README.md)
 - [ ] [Stacks and Queues](ds-algos/data-structures/stacks-queues/README.md)
 - [ ] [Graphs and Trees]()
 - [ ] [Hash Tables]()
