@@ -20,7 +20,7 @@ Output: 1->1->2->3->4->4->5->6
 Node<int>* merge(Node<int> *head1, Node<int> *head2){
     if(head1 && !head2) return head1;
     if(head2 && !head1) return head2;
-    
+
     Node<int> *node_ptr1 = new Node<int>(-1000); // dummy node
     Node<int> *node_ptr2 = new Node<int>(-1000); // dummy node
     node_ptr1->next_node = head1;
@@ -77,21 +77,6 @@ void printList(Node<int> *ptr){
     std::cout<<"]\n";
 }
 
-/*
-Merge k sorted linked lists and return it as one sorted list. Analyze and describe its complexity.
-
-Example:
-
-Input:
-[
-  1->4->5,
-  1->3->4,
-  2->6
-]
-Output: 1->1->2->3->4->4->5->6
-
-
-*/
 int main(int argc, char **argv){
     Node<int> *head1 = new Node<int>(1);
     head1->next_node = new Node<int>(2);
