@@ -1,6 +1,10 @@
-#include "../stack.h"
+#include <iostream>
+#include <stack>
 #include <string>
+#include <sstream>
 using std::string;
+using std::stringstream;
+using std::stack;
 /*
 Given an encoded string, return its decoded string.
 
@@ -17,9 +21,40 @@ s = "3[a2[c]]", return "accaccacc".
 s = "2[abc]3[cd]ef", return "abcabccdcdcdef".
 */
 
-
 string decodeString(string &s){
-    
+    stack<string> st;
+    string token = "";
+    for(char c : s){
+        if(c == '[') {
+            st.push(token); 
+            st.push("[");
+            token = "";
+        } else if(c == ']'){
+            while (st.top() != "[") {token.insert(0, st.top()); st.pop();}
+            st.pop();
+            stringstream ss(st.top()); 
+            st.pop();
+            int count;
+            ss >> count;
+            string res = "";
+            while(count--) res += token;
+            st.push(res);
+            token = "";
+
+        } else {
+            if(!token.empty() && token.at(token.size()-1) >= 'a' && token.at(token.size()-1) <= 'z' && c >= '0' && c <= '9') { 
+                st.push(token); 
+                token = "";
+            }
+            token += c;
+        }
+        
+        
+    }
+    if(!token.empty()) st.push(token);
+    string result = "";
+    while(!st.empty()){ result.insert(0, st.top()); st.pop();} 
+    return result;
 }
 
 
@@ -29,7 +64,7 @@ int main(int argc, char **argv){
     string s3 = "2[abc]3[cd]ef"; // return "abcabccdcdcdef".
 
     std::cout << "s1: " << s1 <<", Ans: aaabcbc\n";
-    std::cout << "s2: " << s2 <<", Ans: aaccaccacc\n";
+    std::cout << "s2: " << s2 <<", Ans: accaccacc\n";
     std::cout << "s3: " << s3 <<", Ans: abcabccdcdcdef\n";
 
     string decodedS1 = decodeString(s1);
