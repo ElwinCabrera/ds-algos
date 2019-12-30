@@ -18,7 +18,7 @@ s = "2[abc]3[cd]ef", return "abcabccdcdcdef".
 */
 
 
-string decodeString(string s){
+string decodeString(string &s){
     
 }
 

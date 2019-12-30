@@ -39,7 +39,7 @@ Follow up:
 
     Can you solve it in O(N) time and O(1) space?
 */
- bool backspaceCompare(string S, string T) {
+ bool backspaceCompare(string &S, string &T) {
     Stack<char> stack;
     for(char c: S){
         if(c == '#' && !stack.empty()) stack.pop();
