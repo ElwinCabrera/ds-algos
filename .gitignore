@@ -7,3 +7,4 @@
 # Cpp output stuff
 *.out
 *.o
+helper*
