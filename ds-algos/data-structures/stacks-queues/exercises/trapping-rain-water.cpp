@@ -1,8 +1,6 @@
 #include <vector>
-#include <stack>
 #include "../stack.h"
 using std::vector;
-using std::stack;
 using std::min;
 class Solution {
 public:
@@ -65,6 +63,6 @@ int main(int argc, char **argv){
 
     vector<int> v = {0,1,0,2,1,0,1,3,2,1,2,1};
     Solution s;
-    std::cout << "trap2 result :" << s.trap2(v) << "\n";
+    std::cout << "trap2 result :" << s.trap3(v) << "\n";
     return 0;
 }
