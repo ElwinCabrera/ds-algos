@@ -1,114 +1,166 @@
 #ifndef TREE_HPP
 #define TREE_HPP
 
-#include <iostream>
 #include <vector>
-#include <string>
 using std::vector;
-using std::string;
-using std::cout;
-using std::max;
-using std::to_string;
 
-class TreeNode{
+template<typename Type>
+class BinaryNode{
 public:
-    int value;
-
-    TreeNode *left;
-    TreeNode *right;
-    TreeNode() {}
-    TreeNode(int val) : value(val), left(nullptr), right(nullptr) {}
+    BinaryNode() {}
+    BinaryNode(Type t): data(t), left(nullptr), right(nullptr) {}
+    Type data;
+    BinaryNode *left;
+    BinaryNode *right;
 };
 
-class Tree {
-
-private:
-    TreeNode *root;
+template<typename Type>
+class NarryNode{
 public:
-    Tree();
-    ~Tree();
-    Tree(vector<int> preorder, vector<int> inorder);
-    
-    TreeNode *buildTree(vector<int> preorder, vector<int> inorder);
-
-    void remove(int val);
-
-    TreeNode* getRoot(){return root;}
-
-    vector<int> getPreOrder();
-    vector<int> getInOrder();
-    vector<int> getPostOrder();
-
-    void printPostOrder();
-    void printInOrder();
-    void printPreOrder();
+    NarryNode() {}
+    NarryNode(Type t): data(t)  {}
+    Type data;
+    vector<NarryNode*> children;
 };
 
+namespace trees {
+
+
+    template<typename Type>
+    class Forest{ // or N-ary Tree
+
+    };
+
+    template<typename Type>
+    class BinaryTree{
+    public:
+        BinaryTree();
+        ~BinaryTree();
+        bool find(Type value);
+        void insert(Type value);
+        void remove(Type value);
+    private:
+        BinaryNode<Type> *root;
+    };
+
+    template<typename Type>
+    class BinarySearchTree{
+    public:
+        BinarySearchTree();
+        ~BinarySearchTree();
+        bool find(Type value);
+        void insert(Type value);
+        void remove(Type value);
+    private:
+        BinaryNode<Type> *root;
+    };
+
+
+
+    template<typename Type>
+    class AVLTree{  //height balanced tree
+    public:
+        AVLTree();
+        ~AVLTree();
+        bool find(Type value);
+        void insert(Type value);
+        void remove(Type value);
+    private:
+        BinaryNode<Type> *root;
+    };
+
+    template<typename Type>
+    class RedBlackTree{
+    public:
+        RedBlackTree();
+        ~RedBlackTree();
+        bool find(Type value);
+        void insert(Type value);
+        void remove(Type value);
+    private:
+        BinaryNode<Type> *root;
+    };
+
+    template<typename Type>
+    class Trie{
+
+    };
+
+    template<typename Type>
+    class SuffixTree{
+
+    };
+
+    template<typename Type>
+    class HuffmanTree{
+    public:
+        HuffmanTree();
+        ~HuffmanTree();
+        bool find(Type value);
+        void insert(Type value);
+        void remove(Type value);
+    private:
+        BinaryNode<Type> *root;
+    };
+
+    template<typename Type>
+    class MinHeap{
+    public:
+        MinHeap();
+        ~MinHeap();
+        bool find(Type value);
+        void insert(Type value);
+        void remove(Type value);
+    private:
+        BinaryNode<Type> *root;
+    };
+
+    template<typename Type>
+    class MaxHeap{
+    public:
+        MaxHeap();
+        ~MaxHeap();
+        bool find(Type value);
+        void insert(Type value);
+        void remove(Type value);
+    private:
+        BinaryNode<Type> *root;
+    };
+
+};
+
+
+template<typename Type>
 class BinaryTree {
 
 private:
     TreeNode *root ;
     TreeNode *rootPtr;
 
-    TreeNode* buildTreeHelper(vector<int> preorder, vector<int> inorder, int leftBound, int rightBound, int nextRootIdx);
+    BinaryNode* buildTreeHelper(vector<int> preorder, vector<int> inorder, int leftBound, int rightBound, int nextRootIdx);
     int findIdx(vector<int> inorder, int num);
-
-    void getPreOrderHelper(TreeNode *tn, vector<int> &v);
-    void getInOrderHelper(TreeNode *tn, vector<int> &v);
-    void getPostOrderHelper(TreeNode *tn, vector<int> &v);
 public:
     
-    BinaryTree();
-    ~BinaryTree();
-    void deleteTree(TreeNode *tn);
+   
     BinaryTree(vector<int> preorder, vector<int> inorder);
 
-    TreeNode *buildTree(vector<int> preorder, vector<int> inorder);
+    BinaryNode *buildTree(vector<int> preorder, vector<int> inorder);
 
-    TreeNode* insert(TreeNode *tn, int num);
+    BinaryNode* insert(BinaryNode *tn, int num);
 
-    void remove(TreeNode *tn, int val);
-    void remove(TreeNode *deleteNode);
+    void remove(BinaryNode *tn, int val);
+    void remove(BinaryNode *deleteNode);
     void removeBiggerThan(int val);
     void removeSmallerThan(int val);
 
-    TreeNode* getRoot() {return root;}
     TreeNode* getMin(TreeNode *tn);
-
-    vector<int> getPreOrder();
-    vector<int> getInOrder();
-    vector<int> getPostOrder();
-
-    void printPostOrder(TreeNode *tn);
-    void printInOrder(TreeNode *tn);
-    void printPreOrder(TreeNode *tn);
 
 };
 
 
-void printTree(TreeNode* root);  
-void populateArray(TreeNode *root, vector<vector<string>> &result, int level, int start, int end);
-int getHeight(TreeNode *root);
-
-
-BinaryTree::BinaryTree(){
-    root = NULL;
-}
 
 BinaryTree::BinaryTree(vector<int> preorder, vector<int> inorder){
     root = buildTree(preorder, inorder);
-}
-
-BinaryTree::~BinaryTree(){
-    printf("destroying tree\n");
-    deleteTree(root);
-}
-void BinaryTree::deleteTree(TreeNode *tn){
-    if(!tn) return;
-    
-    deleteTree(tn->left);
-    deleteTree(tn->right);
-    delete tn;
 }
 
 
@@ -246,145 +298,8 @@ void BinaryTree::remove(TreeNode *tn, int val){
    
 }
 
-void BinaryTree::remove(TreeNode *deleteNode){
-
-}
-
 TreeNode* BinaryTree::getMin(TreeNode *tn){
     if(!tn || !tn->left) return tn;
     return getMin(tn->left);
-}
-
-/* Tree traversals returning a vector*/
-vector<int> BinaryTree::getPreOrder(){
-    vector<int> result;
-    getPreOrderHelper(root, result);
-    return result;
-}
-void BinaryTree::getPreOrderHelper(TreeNode *tn, vector<int> &v){
-    if(!tn) return;
-
-    v.push_back(tn->value);
-    printInOrder(tn->left);
-    printInOrder(tn->right);
-}
-
-vector<int> BinaryTree::getInOrder(){
-    vector<int> result;
-    getInOrderHelper(root, result);
-    return result;
-}
-void BinaryTree::getInOrderHelper(TreeNode *tn, vector<int> &v){
-    if(!tn) return;
-
-    printInOrder(tn->left);
-    v.push_back(tn->value);
-    printInOrder(tn->right);
-}
-
-vector<int> BinaryTree::getPostOrder(){
-    vector<int> result;
-    getPostOrderHelper(root, result);
-    return result;
-}
-void BinaryTree::getPostOrderHelper(TreeNode *tn, vector<int> &v){
-    if(!tn) return;
-
-    printInOrder(tn->left);
-    printInOrder(tn->right);
-    v.push_back(tn->value);
-}
-
-
-
-
-/* Tree traversals printing to stdout */
-void BinaryTree::printPreOrder(TreeNode *root){
-    if(!root) return;
-
-    printf("%d ", root->value);
-    printInOrder(root->left);
-    printInOrder(root->right);
-}
-
-void BinaryTree::printInOrder(TreeNode *root){
-    if(!root) return;
-
-    printInOrder(root->left);
-    printf("%d ", root->value);
-    printInOrder(root->right);
-}
-
-void BinaryTree::printPostOrder(TreeNode *root){
-    if(!root) return;
-    
-    printInOrder(root->left);
-    printInOrder(root->right);
-    printf("%d ", root->value);
-    
-}
-
-
-
-
-
-
-
-
-
- void printTree(TreeNode* root) {
-
-    vector<vector<string>> result;
-    if(!root) return ;
-        
-    int height = getHeight(root);
-    int maxColCount = 0 ;
-    for(int i =1; i<=height; ++i) maxColCount += pow(2, i -1);
-    if(maxColCount %2 == 0) maxColCount += 1;
-        
-    //printf("height = %d, max colCount = %d\n", height, maxColCount);
-        
-        
-    for(int h = 0; h<height; ++h) {
-        vector<string> v;
-        for(int w = 0; w<maxColCount; ++w) v.push_back("");
-        result.push_back(v);
-    }
-    populateArray(root,result, 0, 0, result.at(0).size()-1);
-
-
-    if(result.empty()) {printf("[]\n"); return;}
-    printf("[\n\n");
-    for(vector<string> v: result){
-        printf("[");
-        for(string s: v){
-            if(s == "") cout<<".";
-            else cout<<s<<"";
-        }
-        printf("]\n");
-    }
-    printf("\n]\n");
-        
-}
-    
-void populateArray(TreeNode *root, vector<vector<string>> &result, int level, int start, int end){
-    if(!root ) return;
-        
-    int mid = ((end+1)+start)/2;
-    //printf("mid %d\n", mid);
-    result.at(level).at(mid) = to_string(root->value);
-        
-    populateArray(root->left, result,level+1,start, mid-1);
-    populateArray(root->right, result,level+1, mid+1, end);
-        
-}
-
-int getHeight(TreeNode *root){
-    if(!root) return 0;
-        
-    int left = getHeight(root->left) +1;
-    int right = getHeight(root->right) +1;
-        
-    return max(left, right);
 }
 #endif  //BT_HPP
