@@ -89,7 +89,7 @@ When using this resource it is best to start with going over some core concepts 
 - [ ] [Backtracking Algorithms]()
 
 
-## Licence 
+## License 
 
 This Project is under the BSD 3-Clause licence.
 
