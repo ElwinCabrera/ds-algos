@@ -63,12 +63,12 @@ public:
         removeRecursive(value, this->root); 
     }
 
-    void removeBiggerThan(int val){
-
+    void removeGTE(Type val){
+        removeGTERecursive(val, this->root);
     }
     
-    void removeSmallerThan(int val){
-
+    void removeLTE(Type val){
+        removeLTERecursive(val, this->root);
     }
     
     void deleteTree() {
@@ -87,6 +87,58 @@ public:
 
     const BinaryNode<Type>* getRoot() const{
         return this->root;
+    }
+
+    vector<vector<Type>> getLevelsAsList() const{
+        vector<vector<Type>> result;
+        if(this->root == nullptr) return result;
+        
+        std::vector<BinaryNode<Type>*> lastLevel;
+        lastLevel.push_back(this->root); 
+        
+        while(!lastLevel.empty()){
+            vector<BinaryNode<Type>*> newLevel;
+            vector<Type> resultElem;
+            for(BinaryNode<Type> *bn: lastLevel){
+                if(bn){
+                    if(bn->left) newLevel.push_back(bn->left);
+                    if(bn->right) newLevel.push_back(bn->right);
+                    resultElem.push_back(bn->data);
+                }
+            }
+
+            result.push_back(resultElem);
+            lastLevel.clear();   
+            for(BinaryNode<Type> *bn: newLevel) lastLevel.push_back(bn);
+        }
+        return result;
+        
+    }
+
+    friend bool operator==(const BinarySearchTree<Type> &bst1, const BinarySearchTree<Type> &bst2) { 
+       return bst1.getRoot() == bst2.getRoot();
+    }
+    friend bool operator!=(const BinarySearchTree<Type> &bst1, const BinarySearchTree<Type> &bst2) {
+        return bst1.getRoot() != bst2.getRoot();
+    }
+
+    
+    friend std::ostream& operator<<(std::ostream &os, const BinarySearchTree<Type> &bst) {
+
+        vector<vector<Type>> levels = bst.getLevelsAsList();
+        for(vector<Type> level : levels){
+            os << '[';
+            for(Type data : level){
+                os << data << ' ' << ',';
+            }
+            os << ']' << '\n';
+        }
+        
+        return os ;
+    }
+
+    friend std::istream& operator>>(std::istream &is, const BinarySearchTree<Type> &bst) {
+        return is;
     }
 
     
@@ -134,6 +186,7 @@ private:
         
     }
 
+    //not tested
     BinaryNode<Type> *insertIteratively(Type value){
         
         BinaryNode<Type> *newNode = new BinaryNode<Type>(value);
@@ -167,7 +220,7 @@ private:
         return newNode; 
 
     }
-    void removeRecursive(Type value, BinaryNode<Type> *node){
+    BinaryNode<Type>* removeRecursive(Type value, BinaryNode<Type> *node){
         /*First we need to find the actual node that we want to delete 
         after we find the node we then consider the following three cases.
 
@@ -186,34 +239,87 @@ private:
             that we are trying to delete then just 
             delete the minimum value that we found 
             in one of those trees. */
+        if(node == nullptr) return node;
 
-        if(node->data > value){
-            removeRecursive(value, node->right);
-        } else if(node->data < value){
-            removeRecursive(value, node->left);
+        
+
+        if(value < node->data  ){
+            node->left = removeRecursive(value, node->left);
+        } else if(value > node->data){
+            node->right = removeRecursive(value, node->right);
         } else {
             BinaryNode<Type> *trash = nullptr;
+            BinaryNode<Type> *result = nullptr;
 
-            if(node->left == nullptr && node->right == nullptr) trash = node;
-            if(node->left != nullptr && node->right == nullptr) {
+            if(node->left == nullptr && node->right == nullptr) {  // no children (leaf node)
+                trash = node; 
+            } else if(node->left != nullptr && node->right == nullptr) {  // only a left child 
                 trash = node;
-                node = node->left;
-            }
-            if(node->left == nullptr && node->right != nullptr){
+                result = node->left;
+            } else if(node->left == nullptr && node->right != nullptr){  // only a right child
                 trash = node;
-                node = node->right;
-            }
-            if(node->left != nullptr && node->right != nullptr){
+                result = node->right;
+            } else if(node->left != nullptr && node->right != nullptr){ // both left and right child 
                 BinaryNode<Type> *minNodeToRight = getMinNode(node->right);
                 node->data = minNodeToRight->data;
-                removeRecursive(minNodeToRight->data, minNodeToRight);
+                node->right =  removeRecursive(minNodeToRight->data, node->right);
+                //removeRecursive(minNodeToRight->data, minNodeToRight);
             }
+
             if(trash) {
+                trash->left = nullptr;
+                trash->right = nullptr;
                 delete trash;
-                trash = NULL;
+                trash = nullptr;
             }
+            return result;
         }
+
+        return node;
     }
+
+    BinaryNode<Type>* removeGTERecursive(Type val, BinaryNode<Type> *node){
+        if(node == nullptr) return node;
+        if(val < node->data) node->left = removeGTERecursive(val, node->left);
+        else if(val > node->data) node->right = removeGTERecursive(val, node->right);
+        else {
+            deleteTreeRecursive(node->right);
+            BinaryNode<Type> *trash = node;
+            BinaryNode<Type> *result = result = node->left;
+            
+            if(trash){
+                trash->left = nullptr;
+                trash->right = nullptr;
+                delete trash ;
+                trash = nullptr;
+            }
+            return result;
+            
+        }
+        return node;
+    }
+
+    void removeLTERecursive(Type val, BinaryNode<Type> *node){
+        if(node == nullptr) return node;
+        if(val < node->data) node->left = removeLTERecursive(val, node->left);
+        else if(val > node->data) node->right = removeLTERecursive(val, node->right);
+        else {
+            deleteTreeRecursive(node->right);
+            BinaryNode<Type> *trash = node;
+            BinaryNode<Type> *result = result = node->left;
+            
+            if(trash){
+                trash->left = nullptr;
+                trash->right = nullptr;
+                delete trash ;
+                trash = nullptr;
+            }
+            return result;
+            
+        }
+        return node;
+    }
+
     void deleteTreeRecursive(BinaryNode<Type> *node){
         if(node == nullptr) return;
         
@@ -237,6 +343,7 @@ private:
         newNode->right = deepCopyTree(node->right);
         return newNode;
     }
+    
 };
 
 #endif //TREES_BINARY_SEARCH_TREE_H
