@@ -16,11 +16,17 @@ public:
     }
 
     MinHeap(MinHeap &other){
-
+        this->size = other.size;
+        this->capacity = other.capacity;
+        for(int i = 0; i < other.size; ++i){
+            heapElements.at(i) = other.heapElements.at(i);
+        }
     }
 
     MinHeap(MinHeap &&other){
-
+        &this->heapElements = &other.heapElements;
+        &this->size = &other.size;
+        &this->capacity = &other.capacity;
     }
 
     ~MinHeap(){
@@ -72,6 +78,47 @@ public:
 
     void update(int idx, Type newValue){
         if(idx < size) heapElements.at(idx) = newValue;
+    }
+
+    //use copy-swap to get strong exception guarantee
+    // to do this we need a fully working copy constructor and our own swap function 
+    // 1. make a temp copy of the other object 
+    // 2. swap the temporary object with the current object 
+    MinHeap& operator=(const MinHeap &other){
+        MinHeap temp(other);
+        temp.swap(*this);
+        return *this;
+    }
+
+    friend bool operator==(const MinHeap<Type> &heap1, const MinHeap<Type> &heap2) { 
+       return false;
+    }
+    friend bool operator!=(const MinHeap<Type> &heap1, const MinHeap<Type> &heap2) {
+        return false; 
+    }
+
+    
+    friend std::ostream& operator<<(std::ostream &os, const MinHeap<Type> &heap) {
+
+        
+        
+        return os ;
+    }
+
+    friend std::istream& operator>>(std::istream &is, const MinHeap<Type> &heap) {
+        return is;
+    }
+
+    // friend void swap(BinarySearchTree &first, BinarySearchTree &second){
+    //     using std::swap;
+    //     swap(first.root, second.root);
+    // }
+
+    void swap(MinHeap &other) throw(){
+        using std::swap;
+        swap(&this->heapElements, other.heapElements);
+        swap(this->capacity, other.capacity);
+        swap(this->size, other.size);
     }
 
 
