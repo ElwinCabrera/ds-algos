@@ -1,6 +1,9 @@
 #ifndef TREES_BINARY_SEARCH_TREE_H
 #define TREES_BINARY_SEARCH_TREE_H
 
+#include <vector>
+using std::vector;
+
 template<typename Type>
 class BinaryNode{
 public:
