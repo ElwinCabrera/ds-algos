@@ -61,7 +61,7 @@ public:
         return getMinNode(this->root); 
     } 
     void insert(Type value) { 
-        insertRecursive(value, this->root); 
+        this->root = insertRecursive(value, this->root); 
     }
     void remove(Type value) { 
         removeRecursive(value, this->root); 
@@ -190,47 +190,48 @@ private:
         return getMaxHeight(node->left) - getMaxHeight(node->right);
     }
 
-    BinaryNode<Type> *leftRotate(BinaryNode<Type> *node){
-        BinaryNode<Type> *localRoot = node->right;
-        node->right = localRoot->left;
-        localRoot->left = node;
-        return localRoot;
-    }
-
-    BinaryNode<Type> *rightRotate(BinaryNode<Type> *node){
+    BinaryNode<Type> *LLCase(BinaryNode<Type> *node){
+        //we need to rotate the tree to the right
         BinaryNode<Type> *localRoot = node->left;
         node->left = localRoot->right;
         localRoot->right = node;
         return localRoot;
     }
 
-    BinaryNode<Type>* balanceTreeAtNode(BinaryNode<Type> *node){
-         
-
-         int balanceFactor = getBalanceFactor(node);
-        //if a node becomes unbalanced balance after inserting, there are 4 cases
-
-        //Left Left Case (LL)
-        if(balanceFactor > 1 && value < node->left->data) 
-            return rightRotate(node);
-
-        //Right Right Case (RR)
-        if(balanceFactor < -1 && value > node->right->data) 
-            return leftRotate(node);
-
-        //Left Right Case (LR)
-        if(balanceFactor > 1 && value > node->left->data) {
-            node->left = leftRotate(node->left);
-            return rightRotate(node);
-        }
-
-        //Right Left Case (RL)
-        if(balanceFactor < -1 && value < node->right->data ){
-            node->right = rightRotate(node->right);
-            return leftRotate(node);
-        }
-        return node;
+    BinaryNode<Type> *RRCase(BinaryNode<Type> *node){
+        //We need to rotate the tree to the left
+        BinaryNode<Type> *localRoot = node->right;
+        node->right = localRoot->left;
+        localRoot->left = node;
+        return localRoot;
     }
+
+    BinaryNode<Type> *LRCase(BinaryNode<Type> *node){
+        
+        BinaryNode<Type> *localRoot = node->left->right;
+        BinaryNode<Type> *localRootLeftSubTree = localRoot->left;
+        BinaryNode<Type> *localRootRightSubTree = localRoot->right;
+        
+        localRoot->left = node->left;
+        localRoot->left->right = localRootLeftSubTree;
+        localRoot->right = node;
+        node->left = localRootRightSubTree;
+        return localRoot;
+    }
+
+    BinaryNode<Type> *RLCase(BinaryNode<Type> *node){
+        BinaryNode<Type> *localRoot = node->right->left;
+        BinaryNode<Type> *localRootLeftSubTree = localRoot->left;
+        BinaryNode<Type> *localRootRightSubTree = localRoot->right;
+
+        localRoot->right = node->right;
+        localRoot->right->left = localRootRightSubTree;
+        localRoot->left = node;
+        node->right = localRootLeftSubTree;
+        return localRoot;
+    }
+
+    
 
     BinaryNode<Type>* insertRecursive(Type value, BinaryNode<Type> *node){
         if(root == nullptr) {
@@ -244,28 +245,27 @@ private:
         int balanceFactor = getBalanceFactor(node);
         //if a node becomes unbalanced balance after inserting, there are 4 cases
 
-        //Left Left Case (LL)
+        //Left Left Case (LL) we need to right rotate the tree
         if(balanceFactor > 1 && value < node->left->data) 
-            return rightRotate(node);
+            return LLCase(node);
 
-        //Right Right Case (RR)
+        //Right Right Case (RR) we need to left rotate the tree
         if(balanceFactor < -1 && value > node->right->data) 
-            return leftRotate(node);
+            return RRCase(node);
 
         //Left Right Case (LR)
         if(balanceFactor > 1 && value > node->left->data) {
-            node->left = leftRotate(node->left);
-            return rightRotate(node);
+            return LRCase(node);
+            
         }
 
         //Right Left Case (RL)
         if(balanceFactor < -1 && value < node->right->data ){
-            node->right = rightRotate(node->right);
-            return leftRotate(node);
+            return RLCase(node);
         }
+
         return node;
 
-        return balanceTreeAtNode(node);
         
     }
 
@@ -358,6 +358,17 @@ private:
             }
             return result;
         }
+
+        int balanceFactor = getBalanceFactor(node);
+
+        if(balanceFactor > 1 && getBalanceFactor(node->left) >= 0) return LLCase(node);
+
+        if(balanceFactor > 1 && getBalanceFactor(node->left) < 0) return LRCase(node);
+
+        if(balanceFactor < -1 && getBalanceFactor(node->right) <= 0) return RRCase(node);
+
+        if(balanceFactor < -1 && getBalanceFactor(node->right) > 0) return RLCase(node);
+        
 
         return node;
     }
