@@ -7,7 +7,7 @@ using std::vector;
 template<typename Type>
 class BinaryNode{
 public:
-    BinaryNode() {}
+    BinaryNode(): left(nullptr), right(nullptr) {}
     BinaryNode(Type t): data(t), left(nullptr), right(nullptr) {}
     Type data;
     BinaryNode *left;

@@ -8,7 +8,7 @@ using std::vector;
 template<typename Type>
 class BinaryNode{
 public:
-    BinaryNode() {}
+    BinaryNode(): left(nullptr), right(nullptr) {}
     BinaryNode(Type t): data(t), left(nullptr), right(nullptr) {}
     Type data;
     BinaryNode *left;
@@ -67,22 +67,9 @@ public:
         removeRecursive(value, this->root); 
     }
 
-    void removeGTE(Type val){
-        removeGTERecursive(val, this->root);
-    }
-    
-    void removeLTE(Type val){
-        removeLTERecursive(val, this->root);
-    }
-    
     void deleteTree() {
         deleteTreeRecursive(this->root);
     }
-
-    // friend void swap(AVLTree &first, AVLTree &second){
-    //     using std::swap;
-    //     swap(first.root, second.root);
-    // }
 
     void swap(AVLTree &other) throw(){
         using std::swap;
@@ -269,40 +256,6 @@ private:
         
     }
 
-    //not tested
-    BinaryNode<Type> *insertIteratively(Type value){
-        
-        BinaryNode<Type> *newNode = new BinaryNode<Type>(value);
-        
-        if(!this->root) {
-            this->root = newNode;
-            return this->root;
-        }
-
-        BinaryNode<Type> *rootPtr = this->root;
-        BinaryNode<Type> *parent = nullptr;
-        while (rootPtr->left && rootPtr->right){
-            parent = rootPtr;
-            if(value < rootPtr->data ) rootPtr = rootPtr->left;
-            if(value >= rootPtr->data) rootPtr = rootPtr->right;
-        }
-        while(rootPtr->left){
-            parent = rootPtr;
-            if(value < rootPtr->data) rootPtr = rootPtr->left;
-            if(value >= rootPtr->data) rootPtr = rootPtr->right;
-        }
-        while (rootPtr->right){
-            parent = rootPtr;
-            if(value < rootPtr->data) rootPtr = rootPtr->left;
-            if(value >= rootPtr->data) rootPtr = rootPtr->right;
-        }
-
-        if(parent->right == nullptr) parent->right = newNode;
-        else if(parent->left == nullptr) parent->left = newNode;
-
-        return newNode; 
-
-    }
 
     BinaryNode<Type>* removeRecursive(Type value, BinaryNode<Type> *node){
         /*First we need to find the actual node that we want to delete 
@@ -373,47 +326,6 @@ private:
         return node;
     }
 
-    BinaryNode<Type>* removeGTERecursive(Type val, BinaryNode<Type> *node){
-        if(node == nullptr) return node;
-        if(val < node->data) node->left = removeGTERecursive(val, node->left);
-        else if(val > node->data) node->right = removeGTERecursive(val, node->right);
-        else {
-            deleteTreeRecursive(node->right);
-            BinaryNode<Type> *trash = node;
-            BinaryNode<Type> *result = result = node->left;
-            
-            if(trash){
-                trash->left = nullptr;
-                trash->right = nullptr;
-                delete trash ;
-                trash = nullptr;
-            }
-            return result;
-            
-        }
-        return node;
-    }
-
-    void removeLTERecursive(Type val, BinaryNode<Type> *node){
-        if(node == nullptr) return node;
-        if(val < node->data) node->left = removeLTERecursive(val, node->left);
-        else if(val > node->data) node->right = removeLTERecursive(val, node->right);
-        else {
-            deleteTreeRecursive(node->right);
-            BinaryNode<Type> *trash = node;
-            BinaryNode<Type> *result = result = node->left;
-            
-            if(trash){
-                trash->left = nullptr;
-                trash->right = nullptr;
-                delete trash ;
-                trash = nullptr;
-            }
-            return result;
-            
-        }
-        return node;
-    }
 
     void deleteTreeRecursive(BinaryNode<Type> *node){
         if(node == nullptr) return;
