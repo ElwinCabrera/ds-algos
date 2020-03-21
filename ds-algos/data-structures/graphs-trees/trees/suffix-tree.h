@@ -2,7 +2,7 @@
 #define TREES_SUFFIX_TREE_H
 
 template<typename Type>
-class SuffixTree{
+class SuffixTree{  //A.K.A Trie
 
 };
 
