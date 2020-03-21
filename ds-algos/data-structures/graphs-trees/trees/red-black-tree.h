@@ -293,7 +293,7 @@ private:
             }
         }
         /* Colour the root black */
-        T->root->colour = black;
+        this->root->red = false;
     }
 
     
