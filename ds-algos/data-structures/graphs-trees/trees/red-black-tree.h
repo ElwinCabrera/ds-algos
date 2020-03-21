@@ -408,7 +408,7 @@ private:
 
        
 
-        return restoreTree(node);
+        return node;
     }
 
     BinaryNode<Type>* removeGTERecursive(Type val, BinaryNode<Type> *node){
