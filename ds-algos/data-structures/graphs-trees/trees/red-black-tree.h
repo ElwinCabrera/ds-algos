@@ -254,7 +254,7 @@ private:
                     if ( node->parent->right == node) {
                         /* and node is to the right */ 
                         /* case 2 - move node up and rotate */
-                        LRcase(grandParent);
+                        LRCase(grandParent);
                     } else if(node->parent->left == node ){
                         /* case 3 */
                         //llCase - right rotate
@@ -300,19 +300,20 @@ private:
         }
         /* Colour the root black */
         this->root->color = Color::BLACK;
+        return this->root;
     }
 
     
 
     BinaryNode<Type>* insertRecursive(BinaryNode<Type> *node, BinaryNode<Type> *newNode){
         if(root == nullptr) {
-            root = new BinaryNode<Type>(value);
+            root = newNode;
             root->color = Color::BLACK;
             return root;
         }
         if(node == nullptr) return newNode;
-        if(newNode->data >= node->data) node->right = insertRecursive(value, node->right); 
-        if(newNode->data < node->data) node->left = insertRecursive(value, node->left);
+        if(newNode->data >= node->data) node->right = insertRecursive(node->right, newNode); 
+        if(newNode->data < node->data) node->left = insertRecursive(node->left, newNode);
 
         if(node->left) node->left->parent = node;
         if(node->right) node->right->parent = node;
@@ -348,7 +349,7 @@ private:
                 if(trash->parent->left == trash) trash->parent->left = nullptr;
                 else trash->parent->right = nullptr;
             }
-            delete trash 
+            delete trash;
         }
 
         // trash has 1 child
@@ -387,7 +388,7 @@ private:
         else sibling = node->parent->right;
 
         if(sibling == nullptr){
-            fixDoubleBlack(node->parent)
+            fixDoubleBlack(node->parent);
         } else {
             if(sibling->color == Color::RED){
                 node->parent->color = Color::RED;
@@ -469,9 +470,9 @@ private:
     void printInOrderRecursive(BinaryNode<Type> *node){
         if(node == nullptr) return;
         
-        printInOrder(node->left);
+        printInOrderRecursive(node->left);
         std::cout << node->data << " ";
-        printInOrder(node->right);
+        printInOrderRecursive(node->right);
     }
     
 };
