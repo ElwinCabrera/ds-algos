@@ -190,117 +190,151 @@ private:
         return 0;
     }
 
-    BinaryNode<Type> *LLCase(BinaryNode<Type> *node){
+    BinaryNode<Type> *rightRotate(BinaryNode<Type> *node){
+        //We have a Left Left case
         //we need to rotate the tree to the right
         BinaryNode<Type> *localRoot = node->left;
         node->left = localRoot->right;
+
+        if(localRoot->right != nullptr) localRoot->right->parent = node;
+
+        localRoot->parent = node->parent;
+        
+        if(node->parent == nullptr){
+            this->root = localRoot;
+        } else if(node == node->parent->left){
+            //node is left child of parent update parents left child to localRoot
+            node->parent->left = localRoot;
+        } else {
+            //node is right child of parent update parents right child to localRoot
+            node->parent->right = localRoot;
+        }
+
         localRoot->right = node;
+        node->parent = localRoot;
         return localRoot;
+
+
     }
 
-    BinaryNode<Type> *RRCase(BinaryNode<Type> *node){
-        //We need to rotate the tree to the left
+    BinaryNode<Type> *leftRotate(BinaryNode<Type> *node){
+        //We have Right Right case
+        //we need to rotate the tree to the left
         BinaryNode<Type> *localRoot = node->right;
         node->right = localRoot->left;
+
+        if(localRoot->left != nullptr) localRoot->left->parent = node;
+
+        localRoot->parent = node->parent;
+        if(node->parent == nullptr){
+            //then node is root
+            this->root = localRoot;
+        } else if (node = node->parent-left){
+            node->parent->left = localRoot;
+        } else {
+            node->parent->right = localRoot;
+        }
+        
         localRoot->left = node;
+        node->parent = localRoot;
         return localRoot;
     }
 
-    BinaryNode<Type> *LRCase(BinaryNode<Type> *node){
-        
-        BinaryNode<Type> *localRoot = node->left->right;
-        BinaryNode<Type> *localRootLeftSubTree = localRoot->left;
-        BinaryNode<Type> *localRootRightSubTree = localRoot->right;
-        
-        localRoot->left = node->left;
-        localRoot->left->right = localRootLeftSubTree;
-        localRoot->right = node;
-        node->left = localRootRightSubTree;
-        return localRoot;
-    }
-
-    BinaryNode<Type> *RLCase(BinaryNode<Type> *node){
-        BinaryNode<Type> *localRoot = node->right->left;
-        BinaryNode<Type> *localRootLeftSubTree = localRoot->left;
-        BinaryNode<Type> *localRootRightSubTree = localRoot->right;
-
-        localRoot->right = node->right;
-        localRoot->right->left = localRootRightSubTree;
-        localRoot->left = node;
-        node->right = localRootLeftSubTree;
-        return localRoot;
-    }
-
-    BinaryNode<Type>* insertFix(BinaryNode<Type> *node){
+    void insertFix(BinaryNode<Type> *node){
         
         
-        while ( (node != this->root) && node->parent->color == Color::RED ) {
+        while ( (node != this->root) && node->parent->color == Color::RED ) { // While its not root and we are violating property 3
 
             BinaryNode<Type> *grandParent = node->parent->parent;
             BinaryNode<Type> *uncle = nullptr;
 
             if ( grandParent->left == node->parent ) {
+                //our parent is the the left
+
                 /* If nodes's parent is left of grandparent then nodes uncle is on the right side of grandparent*/
                 if(grandParent->right) uncle = grandParent->right;
                 if (uncle && uncle->color == Color::RED) {
-                    /* case 1 - change the colours */
+                    //uncle is red do recoloring 
+                    /* case 1 - change the colors */
                     node->parent->color = Color::BLACK;
                     uncle->color = Color::BLACK;
                     grandParent->color = Color::RED;
-                    /* Move node up the tree */
+                    /* Move node up the tree to next red node*/
                     node = grandParent;
                 } else {
-                    /* uncle is a black node */
+                    /* uncle is null or a black do rotations */
+                    //Do rotations 
                     if ( node->parent->right == node) {
-                        /* and node is to the right */ 
-                        /* case 2 - move node up and rotate */
-                        LRCase(grandParent);
-                    } else if(node->parent->left == node ){
-                        /* case 3 */
-                        //llCase - right rotate
-                        LLCase(grandParent);
+                        /*  
+                            Case 2 - Left Right case
+                            Update the node to point to parent
+                            Parent is to the left of grandparent and node is to the right of parent so we have a RL case 
+                            we need to rotate right and then rotate left to fix this.
+                        */
+                        node = node->parent;
+                        leftRotate(node->parent);
                     }
-                    //Swap the colors of nodes parent and grand parent
-                    Color parentsColor = node->parent->color;
-                    node->parent->color = grandParent->color;
-                    grandParent->color = parentsColor; 
+
+                    /*  
+                        Case 3 - Left Left case
+                        parent is to the left of grandparent and node is to the left of parent so we have a LL case 
+                        we need to rotate right.
+                    */
+
+                    node->parent->color = Color::Black;
+                    node->parent->parent->color = Color::RED;
+
+                    rightRotate(node->parent->parent); 
                     
                 }
+
 
             } else {
-                /* If nodes's parent is right of grandparent then nodes uncle is on the left side of grandparent*/
-                if(grandParent->left) uncle = grandParent->left;
+                //our parent is to the right 
 
+                /* If nodes's parent is left of grandparent then nodes uncle is on the right side of grandparent*/
+                if(grandParent->left) uncle = grandParent->left;
                 if (uncle && uncle->color == Color::RED) {
-                    /* case 1 - change the colours */
+                    //uncle is red do recoloring 
+                    /* case 1 - change the colors */
                     node->parent->color = Color::BLACK;
                     uncle->color = Color::BLACK;
                     grandParent->color = Color::RED;
-                    /* Move node up the tree */
+                    /* Move node up the tree to next red node*/
                     node = grandParent;
                 } else {
-                    /* uncle is a black node */
+                    /* uncle is null or a black do rotations */
+                    //Do rotations 
                     if ( node->parent->left == node) {
-                        /* and node is to the right */ 
-                        /* case 2 - move node up and rotate */
-                        RLCase(grandParent);
-                    } else if(node->parent->right == node ){
-                        /* case 3 */
-                        //rrCase - right rotate
-                        RRCase(grandParent);
+                        /*  
+                            Case 2 - Right Left case
+                            Update the node to point to parent
+                            Parent is to the right of grandparent and node is to the left of parent so we have a RL case 
+                            we need to rotate right and then rotate left to fix this.
+                        */
+                        node = node->parent;
+                        rightRotate(node->parent);
                     }
-                    //Swap the colors of nodes parent and grand parent
-                    //Swap the colors of nodes parent and grand parent
-                    Color parentsColor = node->parent->color;
-                    node->parent->color = grandParent->color;
-                    grandParent->color = parentsColor;
+
+                    /*  
+                        Case 3 - Right Right case
+                        parent is to the right of grandparent and node is to the right of parent so we have a RR case 
+                        we need to rotate left.
+                    */
+
+                    node->parent->color = Color::Black;
+                    node->parent->parent->color = Color::RED;
+
+                    leftRotate(node->parent->parent); 
                     
                 }
+
+
+                
             }
         }
-        /* Colour the root black */
+        /* Color the root black */
         this->root->color = Color::BLACK;
-        return this->root;
     }
 
     
