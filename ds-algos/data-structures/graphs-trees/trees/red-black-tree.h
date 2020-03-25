@@ -18,6 +18,17 @@ public:
     BinaryNode *right;
     BinaryNode *parent;
     Color color;
+
+    //Convinience method to check childs color because null is considerd as black
+    Color leftChildColor(){ 
+        if(!left) return Color::BLACK;
+        return left->color;
+    }
+
+    Color rightChildColor(){
+        if(!right) return Color::BLACK;
+        return left->color;
+    }
 };
 
 template<typename Type>
@@ -68,7 +79,7 @@ public:
     void insert(Type value) { 
         BinaryNode<Type> *newNode =  new BinaryNode<Type>(value);
         insertRecursive(this->root, newNode); 
-        this->root = insertFix(newNode);
+        insertFix(newNode);
     }
     void remove(Type value) { 
         BinaryNode<Type> *trash = findRecursive(value, this->root);
@@ -229,7 +240,7 @@ private:
         if(node->parent == nullptr){
             //then node is root
             this->root = localRoot;
-        } else if (node = node->parent-left){
+        } else if (node == node->parent->left){
             node->parent->left = localRoot;
         } else {
             node->parent->right = localRoot;
@@ -272,7 +283,7 @@ private:
                             we need to rotate right and then rotate left to fix this.
                         */
                         node = node->parent;
-                        leftRotate(node->parent);
+                        leftRotate(node);
                     }
 
                     /*  
@@ -281,7 +292,7 @@ private:
                         we need to rotate right.
                     */
 
-                    node->parent->color = Color::Black;
+                    node->parent->color = Color::BLACK;
                     node->parent->parent->color = Color::RED;
 
                     rightRotate(node->parent->parent); 
@@ -313,7 +324,7 @@ private:
                             we need to rotate right and then rotate left to fix this.
                         */
                         node = node->parent;
-                        rightRotate(node->parent);
+                        rightRotate(node);
                     }
 
                     /*  
@@ -322,7 +333,7 @@ private:
                         we need to rotate left.
                     */
 
-                    node->parent->color = Color::Black;
+                    node->parent->color = Color::BLACK;
                     node->parent->parent->color = Color::RED;
 
                     leftRotate(node->parent->parent); 
@@ -358,124 +369,76 @@ private:
     }
 
 
-    void deleteNode(BinaryNode<Type> *trash){
-        BinaryNode<Type> *replacement = findReplacementNodeFor(trash);
+    BinaryNode<Type>* safeDeleteNode(BinaryNode<Type> *trash){
+        BinaryNode<Type> *trueTrash = trash;
 
-        bool isDoubleBlack =  ((replacement == nullptr || replacement->color == Color::BLACK) && (trash->color == Color::BLACK));
+        if(trash->left != nullptr && trash->right != nullptr) trueTrash = getMinNode(trash->right);
+        
+        BinaryNode<Type> *replacementNode = nullptr;
 
-        // replacement is nullptr therefore trash is leaf 
-        if(replacement == nullptr) {
-            if(trash != this->root) {
-                
-                if(isDoubleBlack){
-                    fixDoubleBlack(trash);
-                } else{
-                    // replacement or trash is red 
-                    if(trash->parent->left == trash) {
-                        // sibling is not null, make it red" 
-                        if(trash->parent->right) trash->parent->right->color = Color::RED;
-                    } else {
-                        // sibling is not null, make it red" 
-                        if(trash->left->right) trash->parent->left->color = Color::RED;
-                    }
-                }
+        if(trueTrash->left != nullptr)  replacementNode = trueTrash->left;
+        else replacementNode = trueTrash->right;
 
-                if(trash->parent->left == trash) trash->parent->left = nullptr;
-                else trash->parent->right = nullptr;
-            }
-            delete trash;
+        replacementNode->parent = trueTrash->parent;
+        if(trueTrash->parent == nullptr){
+            this->root = replacementNode;
+        } else { 
+            if(trueTrash == trueTrash->parent->left) trueTrash->parent->left = replacementNode;
+            else trueTrash->parent->right = replacementNode;
+        } 
+
+        if(trueTrash != trash) {
+            trash->data = trueTrash->data;
+            replacementNode->color = trueTrash->color;
         }
 
-        // trash has 1 child
-        if(trash->left == nullptr || trash->right == nullptr){
-            if(trash == this->root){
-                trash->data = replacement->data;
-                trash->left = trash->right = nullptr;
-                trash = replacement;
-            } else {
-                replacement->parent = trash->parent;
-                
-                if(trash->parent->left == trash) trash->parent->left = replacement;
-                else trash->parent->right = replacement;
-                
-                if(isDoubleBlack) fixDoubleBlack(replacement);
-                else replacement->color = Color::RED; // replacement or trash red, color replacement black 
-            }
-            delete trash;
-        } 
+        if(trueTrash->color == Color::BLACK){
+            replacementNode->color = Color::DOUBLEBLACK;
+            fixDoubleBlack(replacementNode);
+        }
 
-        if(trash->left != nullptr || trash->right != nullptr){
-            Type tmp = replacement->data;
-            replacement->data = trash->data;
-            trash->data = tmp;
-            deleteNode(replacement);
-        } 
-    
+        return trueTrash;
     }
 
     void fixDoubleBlack(BinaryNode<Type> *node){
-        if(node == this->root) return;
-
-        BinaryNode<Type> *sibling = nullptr;
-
-        if(node->parent->left == node) sibling = node->parent->left;
-        else sibling = node->parent->right;
-
-        if(sibling == nullptr){
-            fixDoubleBlack(node->parent);
-        } else {
-            if(sibling->color == Color::RED){
-                node->parent->color = Color::RED;
-                sibling->color = Color::BLACK;
-
-                if(sibling->parent->left == sibling) LLCase(node->parent);
-                else RRCase(node->parent);
-
-                fixDoubleBlack(node);
-            } else {
-                //sibling is black 
-
-                //if sibling has at least 1 red child 
-                if(sibling->left != nullptr && sibling->left->color == Color::RED){
-                    if(sibling->parent->left == sibling) {
-                        sibling->left->color = sibling->color;
-                        sibling->color = sibling->parent->color;
-                        LLCase(sibling->parent);
-                    } else {
-                        sibling->left->color = sibling->parent->color;
-                        RLCase(sibling->parent);
-                    }
-                } else if(sibling->right != nullptr && sibling->right->color == Color::RED){
-                    if(sibling->parent->left == sibling) {
-                        sibling->left->color = sibling->color;
-                        sibling->color = sibling->parent->color;
-                        LRCase(sibling->parent);
-                    } else {
-                        sibling->left->color = sibling->parent->color;
-                        RRCase(sibling->parent);
-                    }
+        
+        while(node != this->root && node->color == Color::DOUBLEBLACK){
+            BinaryNode<Type> *sibling = nullptr;
+            if(node->parent->left == node){
+                //our node is on the left side of our parent
+                sibling = node->parent->right;
+                if(sibling && sibling->color == Color::RED){
+                    sibling->color = Color::BLACK;
+                    node->parent->color = Color::RED;
+                    leftRotate(node->parent);
+                    sibling = node->parent->right;
                 }
-
-                if(sibling->left && sibling->right && sibling->left->color == Color::BLACK && sibling->right->color == Color::BLACK){
+                if(sibling && sibling->leftChildColor() == Color::BLACK && sibling->rightChildColor() == Color::BLACK){ 
                     sibling->color = Color::RED;
-                    if(sibling->parent->color == Color::BLACK) fixDoubleBlack(sibling->parent);
-                     
-                }
-                sibling->parent->color = Color::BLACK;
+                    node = node->parent;
+                    node->color = Color::DOUBLEBLACK;
+                } else {
+                    if(sibling && sibling->rightChildColor() == Color::BLACK){
+                        if(sibling->left) sibling->left = Color::BLACK;
+                        sibling->color = Color::RED;
+                        rightRotate(sibling);
+                    }
 
-                
+                    sibling->color = node->parent->color;
+                    node->parent->color = Color::BLACK;
+                    leftRotate(node->parent);
+                    node = this->root;
+                    node->color = Color::DOUBLEBLACK;
+                }
+
+
+            } else {
+                //our node is on the right side of its parent
             }
         }
+        node->color = Color::BlLACK;
     }
 
-    BinaryNode<Type>* findReplacementNodeFor(BinaryNode<Type> *target){
-        if(target->left != nullptr && target->right != nullptr) return getMinNode(target->right);
-
-        if(target->left == nullptr && target->right == nullptr) return nullptr;
-
-        if(target->left != nullptr) return target->left;
-        else return target->right;
-    }
 
     void deleteTreeRecursive(BinaryNode<Type> *node){
         if(node == nullptr) return;
