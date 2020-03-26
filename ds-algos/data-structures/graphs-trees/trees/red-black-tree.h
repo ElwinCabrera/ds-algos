@@ -93,7 +93,7 @@ public:
         BinaryNode<Type> *trash = findRecursive(value, this->root);
         trash = safeDeleteNode(trash);
         delete trash;
-    }
+    } 
     
     void deleteTree() {
         deleteTreeRecursive(this->root);
