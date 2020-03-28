@@ -54,7 +54,7 @@ When using this resource it is best to start with going over some core concepts 
 - [x] [Lists](ds-algos/data-structures/lists/README.md)
 - [x] [Stacks and Queues](ds-algos/data-structures/stacks-queues/README.md)
 - [ ] [Graphs and Trees]()
-- [ ] [Hash Tables]()
+- [ ] [Maps and Sets]()
 
 ### Algorithms
 
