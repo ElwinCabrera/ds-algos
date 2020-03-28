@@ -1,10 +1,12 @@
 #ifndef TREES_RED_BLACK_TREE_H
 #define TREES_RED_BLACK_TREE_H
 
+#include <queue>
 #include <vector>
 #include <iostream>
-using std::vector;
+using std::queue;
 using std::cout;
+using std::vector;
 
 enum Color {RED, BLACK, DOUBLEBLACK};
 
@@ -19,16 +21,6 @@ public:
     BinaryNode *parent;
     Color color;
 
-    //Convinience method to check childs color because null is considerd as black
-    Color leftChildColor(){ 
-        if(!left) return Color::BLACK;
-        return left->color;
-    }
-
-    Color rightChildColor(){
-        if(!right) return Color::BLACK;
-        return left->color;
-    }
 };
 
 template<typename Type>
@@ -110,31 +102,6 @@ public:
         return this->root;
     }
 
-    vector<vector<Type>> getLevelsAsList() const{
-        vector<vector<Type>> result;
-        if(this->root == this->nill) return result;
-        
-        std::vector<BinaryNode<Type>*> lastLevel;
-        lastLevel.push_back(this->root); 
-        
-        while(!lastLevel.empty()){
-            vector<BinaryNode<Type>*> newLevel;
-            vector<Type> resultElem;
-            for(BinaryNode<Type> *bn: lastLevel){
-                if(bn){
-                    if(bn->left) newLevel.push_back(bn->left);
-                    if(bn->right) newLevel.push_back(bn->right);
-                    resultElem.push_back(bn->data);
-                }
-            }
-
-            result.push_back(resultElem);
-            lastLevel.clear();   
-            for(BinaryNode<Type> *bn: newLevel) lastLevel.push_back(bn);
-        }
-        return result;
-        
-    }
 
     void clear(){
         deleteTreeRecursive(this->root);
@@ -144,44 +111,81 @@ public:
         this->root = nullptr;
     }
 
-    void printInOrder(){
-        std::cout << "In order traversal: [";
-        printInOrderRecursive(this->root);
-        std::cout << "]\n";
-    }
-
-    void printLevelOrder(){
-
-        std::cout << "\n";
-    }
-
-    friend bool operator==(const RedBlackTree<Type> &bst1, const RedBlackTree<Type> &bst2) { 
-       return bst1.getRoot() == bst2.getRoot();
-    }
-    friend bool operator!=(const RedBlackTree<Type> &bst1, const RedBlackTree<Type> &bst2) {
-        return bst1.getRoot() != bst2.getRoot();
-    }
-
-    
-    friend std::ostream& operator<<(std::ostream &os, const RedBlackTree<Type> &bst) {
-
-        vector<vector<Type>> levels = bst.getLevelsAsList();
-        for(vector<Type> level : levels){
-            os << '[';
-            for(Type data : level){
-                os << data << ' ' << ',';
-            }
-            os << ']' << '\n';
-        }
+    vector<Type> getPreOrderTraversalList() const{
+        vector<Type> result;
+        getPreOrderTraversalListHelper(this->root, result);
+        return result;
         
-        return os ;
+    }
+ 
+    vector<Type> getInOrderTraversalList() const{
+        vector<Type> result;
+        getInOrderTraversalListHelper(this->root, result);
+        return result;
     }
 
-    friend std::istream& operator>>(std::istream &is, const RedBlackTree<Type> &bst) {
-        return is;
+    vector<Type> getPostOrderTraversalList() const{
+        vector<Type> result;
+        getPostOrderTraversalListHelper(this->root, result);
+        return result;
+    }
+
+    vector<Type> getLevelOrderTraversalList() const{
+        vector<Type> result;
+        if(this->root == nullptr) return result;
+
+        queue<BinaryNode<Type>*> q;
+        q.push(this->root);
+
+        while(!q.empty()) {
+            BinaryNode<Type> *frontNode = q.front();
+            if(frontNode != nullptr && frontNode != this->nill){
+               result.push_back(frontNode->data);
+               q.push(frontNode->left);
+               q.push(frontNode->right); 
+            } 
+            q.pop();
+        }
+
+        return result;   
     }
 
     
+
+    friend bool operator==(const RedBlackTree<Type> &rbTree1, const RedBlackTree<Type> &rbTree2) { 
+       return rbTree1.getRoot() == rbTree2.getRoot();
+    }
+    friend bool operator!=(const RedBlackTree<Type> &rbTree1, const RedBlackTree<Type> &rbTree2) {
+        return rbTree1.getRoot() != rbTree2.getRoot();
+    }
+
+    
+    friend std::ostream& operator<<(std::ostream &os, const RedBlackTree<Type> &rbTree) {
+        vector<Type> preOrder = rbTree.getPreOrderTraversalList();
+        vector<Type> inOrder = rbTree.getInOrderTraversalList();
+        vector<Type> postOrder = rbTree.getPostOrderTraversalList();
+        vector<Type> levelOrder = rbTree.getLevelOrderTraversalList();
+
+        
+        os << "Printing pre-order: [";
+        for(Type data : preOrder) os << data << " ,";
+        os << "\b]\n";
+
+        os << "Printing in-order: [";
+        for(Type data : inOrder) os << data << " ,";
+        os << "\b]\n";
+
+        os << "Printing post-order: [";
+        for(Type data : postOrder) os << data << " ,";
+        os << "\b]\n";
+
+        os << "Printing level-order: [";
+        for(Type data : levelOrder) os << data << " ,";
+        os << "\b]\n";
+        
+        return os;
+    }
+
 
 private:
     BinaryNode<Type> *root;
@@ -521,12 +525,28 @@ private:
         return newNode;
     }
 
-    void printInOrderRecursive(BinaryNode<Type> *node){
+    void getPreOrderTraversalListHelper(BinaryNode<Type> *node, vector<Type> &result) const{
         if(node == this->nill) return;
         
-        printInOrderRecursive(node->left);
-        std::cout << node->data << " ";
-        printInOrderRecursive(node->right);
+        result.push_back(node->data);
+        getPreOrderTraversalListHelper(node->left, result);
+        getPreOrderTraversalListHelper(node->right, result);
+    }
+
+    void getInOrderTraversalListHelper(BinaryNode<Type> *node, vector<Type> &result) const{
+        if(node == this->nill) return;
+        
+        getInOrderTraversalListHelper(node->left, result);
+        result.push_back(node->data);
+        getInOrderTraversalListHelper(node->right, result);
+    }
+
+    void getPostOrderTraversalListHelper(BinaryNode<Type> *node, vector<Type> &result) const{
+        if(node == this->nill) return;
+        
+        getPostOrderTraversalListHelper(node->left, result);
+        getPostOrderTraversalListHelper(node->right, result);
+        result.push_back(node->data);
     }
     
 };
