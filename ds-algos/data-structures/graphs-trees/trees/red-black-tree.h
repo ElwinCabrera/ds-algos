@@ -421,7 +421,7 @@ private:
 
         if(trueTrash != trash) {
             trash->data = trueTrash->data;
-            replacementNode->color = trueTrash->color;
+            //replacementNode->color = trueTrash->color;
         }
 
         if(trueTrash->color == Color::BLACK)
