@@ -54,7 +54,7 @@ enum SortingType{
 template<typename T>
 class Sorting {
 public:
-    Sorting(vector<T> &list, uint sampleSize) {
+    Sorting(vector<T> &list, uint sampleSize = 1) {
         srand (time(NULL));
         
 
@@ -75,7 +75,7 @@ public:
     }
 
 
-    Sorting(uint size, uint sampleSize){
+    Sorting(uint size, uint sampleSize = 1){
         
         srand (time(NULL));
         
