@@ -2,16 +2,23 @@
 #define SORTING_H
 
 
-//Got the code snippet below from https://www.eriksmistad.no/measuring-runtime-in-milliseconds-using-the-c-11-chrono-library/ 
+//Got the code snippet below from https://www.eriksmistad.no/measuring-runtime-in-milliseconds-using-the-c-11-chrono-library/ and modified it to my liking 
+
+
 #define TIMING
  
 #ifdef TIMING
-#define INIT_TIMER auto start = std::chrono::high_resolution_clock::now();
+#define INIT_TIMER auto start = std::chrono::high_resolution_clock::now(); \
+                   auto stop = std::chrono::high_resolution_clock::now();
+
 #define START_TIMER  start = std::chrono::high_resolution_clock::now();
-#define STOP_TIMER(name)  std::cout << "RUNTIME of " << name << ": " << \
-    std::chrono::duration_cast<std::chrono::nanoseconds>( \
-            std::chrono::high_resolution_clock::now()-start \
-    ).count() << " ns " << std::endl; 
+
+#define STOP_TIMER(name)  stop = std::chrono::high_resolution_clock::now(); \
+                        std::cout << "RUNTIME of " << name << ": " << \
+                        std::chrono::duration_cast<std::chrono::nanoseconds>(stop-start).count() << " ns, " <<  \
+                        std::chrono::duration_cast<std::chrono::milliseconds>(stop-start).count() << " ms, " << \
+                        std::chrono::duration_cast<std::chrono::seconds>(stop-start).count() << " sec " << std::endl;
+
 #else
 #define INIT_TIMER
 #define START_TIMER
@@ -21,30 +28,55 @@
 //End citation 
 
 
-
+#include <iostream>
 #include <vector>
 #include <set>
-#include <iostream>
 #include <chrono>
+#include <unordered_map>
 using std::vector;
 using std::cout;
 using std::set;
+using std::unordered_map;
+
+enum SortingType{
+    BASE,
+    BASEHALF,
+    SELECTIONSORT,
+    BUBBLESORT,
+    INSERTIONSORT,
+    MERGESORT,
+    OPTIMIZEDMERGESORT,
+    QUICKSORT,
+    COUNTINGSORT,
+    DUMMYLAST       // used as a dummy does not represent anything
+};
 
 template<typename T>
 class Sorting {
 public:
-    Sorting(vector<T> &list) {
+    Sorting(vector<T> &list, uint sampleSize) {
         srand (time(NULL));
         
+
         sortMe = list;
         originalOrderArray = list;
 
+        
+        
+
+        currentlyRunning = SortingType::DUMMYLAST;
         comparisonCount = 0;
         swapCount = 0;
         memWrites = 0;
+        this->sampleSize = sampleSize;
+
+        init();
 
     }
-    Sorting(uint size){
+
+
+    Sorting(uint size, uint sampleSize){
+        
         srand (time(NULL));
         
         sortMe.reserve(size);
@@ -57,26 +89,29 @@ public:
 
         originalOrderArray = sortMe;
 
-        INIT_TIMER
-        START_TIMER
-        for(uint i = 0; i < originalOrderArray.size(); ++i) ;
-        STOP_TIMER("Linear Run")
+        
 
+        currentlyRunning = SortingType::DUMMYLAST;
         comparisonCount = 0;
         swapCount = 0;
         memWrites = 0;
+        this->sampleSize = sampleSize;
+
+        init();
     }
     ~Sorting(){
 
     }
 
     vector<T> selectionSort(){
-        cout << "\n\u001b[34mSelection Sort\u001b[0m\n";
-        cout << "Unsorted array: ";
-        printArrayAndStats(false);
+        currentlyRunning = SortingType::SELECTIONSORT;
+        if(sortingAlgoToNumRuns.find(SortingType::SELECTIONSORT)->second == 0){
+            cout << "\n\u001b[34mSelection Sort\u001b[0m\n";
+            cout << "Unsorted array: ";
+            printArrayAndStats(false);
+        }
 
-        INIT_TIMER
-        START_TIMER
+        startTime = std::chrono::high_resolution_clock::now();
         for(uint i = 0; i < sortMe.size(); ++i ){
             for(uint j = i +1; j < sortMe.size(); ++j){
                 if(this->sortMe.at(j) < this->sortMe.at(i)) {
@@ -85,24 +120,31 @@ public:
                 comparisonCount++;
             }
         }
-        STOP_TIMER("Selection Sort")
+        endTime = std::chrono::high_resolution_clock::now();
+
+        sortingAlgoToNumRuns.find(SortingType::SELECTIONSORT)->second++;
+        sortingAlgoToTime.find(SortingType::SELECTIONSORT)->second += std::chrono::duration_cast<std::chrono::nanoseconds>(endTime-startTime).count();
 
 
-        
-        cout << "Sorted array:   ";
-        printArrayAndStats(true);
-        cout << "Selection sort done\n";
+        if(sortingAlgoToNumRuns.find(SortingType::SELECTIONSORT)->second >= sampleSize){
+            cout << "Sorted array:   ";
+            printArrayAndStats(true);
+            cout << "Selection sort done\n";
+        }
 
         return this->sortMe;
     }
 
     vector<T> bubbleSort(){
-        cout << "\n\u001b[34mBubble Sort\u001b[0m\n";
-        cout << "Unsorted array: ";
-        printArrayAndStats(false);
+        currentlyRunning = SortingType::BUBBLESORT;
+        if(sortingAlgoToNumRuns.find(SortingType::BUBBLESORT)->second == 0){
+            cout << "\n\u001b[34mBubble Sort\u001b[0m\n";
+            cout << "Unsorted array: ";
+            printArrayAndStats(false);
+        }
         
-        INIT_TIMER
-        START_TIMER   
+        
+        startTime = std::chrono::high_resolution_clock::now();
         for(uint i = 0; i < sortMe.size(); ++i){
             for(uint j = 1; j < (sortMe.size() - i); ++j){
                 if(sortMe.at(j-1) > sortMe.at(j)) {
@@ -111,25 +153,33 @@ public:
                 comparisonCount++;
             }
         }
-        STOP_TIMER("Bubble Sort")
+        endTime = std::chrono::high_resolution_clock::now();
 
+        sortingAlgoToNumRuns.find(SortingType::BUBBLESORT)->second++;
+        sortingAlgoToTime.find(SortingType::BUBBLESORT)->second += std::chrono::duration_cast<std::chrono::nanoseconds>(endTime-startTime).count();
         
-        cout << "Sorted array:   ";
-        printArrayAndStats(true);
-        cout << "Bubble sort done\n";
+        if(sortingAlgoToNumRuns.find(SortingType::BUBBLESORT)->second >= sampleSize){
+            cout << "Sorted array:   ";
+            printArrayAndStats(true);
+            cout << "Bubble sort done\n";
+        }
+        
 
         return this->sortMe;
     }
 
     vector<T> insertionSort(){
+        currentlyRunning = SortingType::INSERTIONSORT;
         //slightly optimized insertion sort
         // adding the key at the end in its correct position to reduce many writes
-        cout << "\n\u001b[34mInsertion Sort\u001b[0m\n";
-        cout << "Unsorted array: "; 
-        printArrayAndStats(false);
+        if(sortingAlgoToNumRuns.find(SortingType::INSERTIONSORT)->second == 0){
+            cout << "\n\u001b[34mInsertion Sort\u001b[0m\n";
+            cout << "Unsorted array: "; 
+            printArrayAndStats(false);
+        }
         
-        INIT_TIMER
-        START_TIMER
+        
+        startTime = std::chrono::high_resolution_clock::now();
         for(uint i = 1; i < sortMe.size(); ++i){
             T key = sortMe.at(i);
             int j = i -1;
@@ -141,68 +191,89 @@ public:
             comparisonCount++;
             sortMe.at(j+1) = key; 
         }
-        STOP_TIMER("Insertion Sort")
+        endTime = std::chrono::high_resolution_clock::now();
+
+        sortingAlgoToNumRuns.find(SortingType::INSERTIONSORT)->second++;
+        sortingAlgoToTime.find(SortingType::INSERTIONSORT)->second += std::chrono::duration_cast<std::chrono::nanoseconds>(endTime-startTime).count();
         
-        cout << "Sorted array:   ";
-        printArrayAndStats(true);
-        cout << "Insertion sort done\n";
+        if(sortingAlgoToNumRuns.find(SortingType::INSERTIONSORT)->second >= sampleSize){
+            cout << "Sorted array:   ";
+            printArrayAndStats(true);
+            cout << "Insertion sort done\n";
+        }
         
         return sortMe;
     }
 
 
     vector<T> mergeSort(){
-        cout << "\n\u001b[34mMerge Sort\u001b[0m\n";
-        cout << "Unsorted array: "; 
-        printArrayAndStats(false);
+        currentlyRunning = SortingType::MERGESORT;
+        if(sortingAlgoToNumRuns.find(SortingType::MERGESORT)->second == 0){
+            cout << "\n\u001b[34mMerge Sort\u001b[0m\n";
+            cout << "Unsorted array: "; 
+            printArrayAndStats(false);
+        }
         
-        INIT_TIMER
-        START_TIMER
+        startTime = std::chrono::high_resolution_clock::now();
         vector<T> result = mergeSortHelper(sortMe);
-        STOP_TIMER("Merge Sort")
-    
-        sortMe = result;
+        endTime = std::chrono::high_resolution_clock::now();
 
+        sortingAlgoToNumRuns.find(SortingType::MERGESORT)->second++;
+        sortingAlgoToTime.find(SortingType::MERGESORT)->second += std::chrono::duration_cast<std::chrono::nanoseconds>(endTime-startTime).count();
         
-        cout << "Sorted array:   ";
-        printArrayAndStats(true);
-        cout << "Merge sort done\n";
+        sortMe = result;
+        if(sortingAlgoToNumRuns.find(SortingType::MERGESORT)->second >= sampleSize){
+            cout << "Sorted array:   ";
+            printArrayAndStats(true);
+            cout << "Merge sort done\n";
+        }
         
         return sortMe;
     }
 
     vector<T> optimizedMergeSort(){
-        cout << "\n\u001b[34mOptimized Merge Sort\u001b[0m\n";
-        cout << "Unsorted array: "; 
-        printArrayAndStats(false);
+        currentlyRunning = SortingType::OPTIMIZEDMERGESORT;
+        if(sortingAlgoToNumRuns.find(SortingType::OPTIMIZEDMERGESORT)->second == 0){
+            cout << "\n\u001b[34mOptimized Merge Sort\u001b[0m\n";
+            cout << "Unsorted array: "; 
+            printArrayAndStats(false);
+        }
         
-        INIT_TIMER
-        START_TIMER
+        startTime = std::chrono::high_resolution_clock::now();
         optimizedMergeSortHelper(0, sortMe.size()-1);
-        STOP_TIMER("Optimized Merge Sort")
+        endTime = std::chrono::high_resolution_clock::now();
 
-        
-        cout << "Sorted array:   ";
-        printArrayAndStats(true);
-        cout << "Optimized merge sort done\n";
-        
+        sortingAlgoToNumRuns.find(SortingType::OPTIMIZEDMERGESORT)->second++;
+        sortingAlgoToTime.find(SortingType::OPTIMIZEDMERGESORT)->second += std::chrono::duration_cast<std::chrono::nanoseconds>(endTime-startTime).count();
+
+        if(sortingAlgoToNumRuns.find(SortingType::OPTIMIZEDMERGESORT)->second >= sampleSize){
+            cout << "Sorted array:   ";
+            printArrayAndStats(true);
+            cout << "Optimized merge sort done\n";
+        }
         return sortMe;
     }
 
     vector<T> quickSort(){
-        cout << "\n\u001b[34mQuick Sort\u001b[0m\n";
-        cout << "Unsorted array: " ;
-        printArrayAndStats(false);
+        currentlyRunning = SortingType::QUICKSORT;
+        if(sortingAlgoToNumRuns.find(SortingType::QUICKSORT)->second == 0){
+            cout << "\n\u001b[34mQuick Sort\u001b[0m\n";
+            cout << "Unsorted array: " ;
+            printArrayAndStats(false);
+        }
         
-        INIT_TIMER
-        START_TIMER
+        startTime = std::chrono::high_resolution_clock::now();
         quickSortHelper(0, sortMe.size()-1);
-        STOP_TIMER("Quick Sort")
-        
-        
-        cout << "Sorted array:   ";
-        printArrayAndStats(true);
-        cout << "Quick sort done\n";
+        endTime = std::chrono::high_resolution_clock::now();
+
+        sortingAlgoToNumRuns.find(SortingType::QUICKSORT)->second++;
+        sortingAlgoToTime.find(SortingType::QUICKSORT)->second += std::chrono::duration_cast<std::chrono::nanoseconds>(endTime-startTime).count();
+
+        if(sortingAlgoToNumRuns.find(SortingType::QUICKSORT)->second >= sampleSize){
+            cout << "Sorted array:   ";
+            printArrayAndStats(true);
+            cout << "Quick sort done\n";
+        }
         
         return sortMe;
     }
@@ -213,12 +284,15 @@ public:
 
     //This will only work with numbers
     vector<T> countingSort(){
-        cout << "\n\u001b[34mCounting Sort\u001b[0m\n";
-        cout << "Unsorted array: "; 
-        printArrayAndStats(false);
+        currentlyRunning = SortingType::COUNTINGSORT;
+        if(sortingAlgoToNumRuns.find(SortingType::COUNTINGSORT)->second == 0){
+            cout << "\n\u001b[34mCounting Sort\u001b[0m\n";
+            cout << "Unsorted array: "; 
+            printArrayAndStats(false);
+        }
         
-        INIT_TIMER
-        START_TIMER
+        
+        startTime = std::chrono::high_resolution_clock::now();
 
         T maxVal = sortMe.at(0);
         for(T val: sortMe){
@@ -234,12 +308,17 @@ public:
                 sortMe.at(sortMeIdx++) = (T) i;
             }
         }
-        STOP_TIMER("Counting Sort")
-        
-        cout << "Sorted array:   ";    
-        printArrayAndStats(true);
-        cout << "Counting sort done\n";
+        endTime = std::chrono::high_resolution_clock::now();
 
+        sortingAlgoToNumRuns.find(SortingType::COUNTINGSORT)->second++;
+        sortingAlgoToTime.find(SortingType::COUNTINGSORT)->second += std::chrono::duration_cast<std::chrono::nanoseconds>(endTime-startTime).count();
+        
+        if(sortingAlgoToNumRuns.find(SortingType::COUNTINGSORT)->second >= sampleSize){
+            cout << "Sorted array:   ";    
+            printArrayAndStats(true);
+            cout << "Counting sort done\n";
+        }
+        
         return sortMe;
 
     }
@@ -254,33 +333,48 @@ public:
 
 
     void runAllSorting(){
-        selectionSort();
+       
+        for(uint i = 0; i < sampleSize; ++i){
+            selectionSort();
+            sortMe = originalOrderArray;
+        }
         //randomizeArrayOrder();
-        sortMe = originalOrderArray;
+        
+        for(uint i = 0; i < sampleSize; ++i){
+            bubbleSort();
+            //randomizeArrayOrder();
+            sortMe = originalOrderArray;
+        }
 
-        bubbleSort();
-        //randomizeArrayOrder();
-        sortMe = originalOrderArray;
+        for(uint i = 0; i < sampleSize; ++i){
+            insertionSort();
+            //randomizeArrayOrder();
+            sortMe = originalOrderArray;
+        }
 
-        insertionSort();
-        //randomizeArrayOrder();
-        sortMe = originalOrderArray;
+        for(uint i = 0; i < sampleSize; ++i){
+            mergeSort();
+            //randomizeArrayOrder();
+            sortMe = originalOrderArray;
+        }
 
-        mergeSort();
-        //randomizeArrayOrder();
-        sortMe = originalOrderArray;
+        for(uint i = 0; i < sampleSize; ++i){
+            optimizedMergeSort();
+            //randomizeArrayOrder();
+            sortMe = originalOrderArray;
+        }
 
-        optimizedMergeSort();
-        //randomizeArrayOrder();
-        sortMe = originalOrderArray;
+        for(uint i = 0; i < sampleSize; ++i){
+            quickSort();
+            //randomizeArrayOrder();
+            sortMe = originalOrderArray;
+        }
 
-        quickSort();
-        //randomizeArrayOrder();
-        sortMe = originalOrderArray;
-
-        countingSort();
-        //randomizeArrayOrder();
-        sortMe = originalOrderArray;
+        for(uint i = 0; i < sampleSize; ++i){
+            countingSort();
+            //randomizeArrayOrder();
+            sortMe = originalOrderArray;
+        }
     }
 
    
@@ -331,11 +425,14 @@ public:
         cout << "\u001b[0m";
 
         if(printStats){
-            cout << "Comparison count = " << comparisonCount << "\n";
-            cout << "Swap count = " << swapCount << "\n";
-            cout << "Memory writes = " << memWrites << "\n";
-            //elapsedSeconds = endTime - startTime;
-            //cout << "Elapsed time: " << elapsedSeconds.count() << "s\n"; 
+            cout << "Comparison count: " << comparisonCount/ sortingAlgoToNumRuns.find(currentlyRunning)->second << "\n";
+            cout << "Swap count:       " << swapCount/ sortingAlgoToNumRuns.find(currentlyRunning)->second << "\n";
+            cout << "Memory writes:    " << memWrites/ sortingAlgoToNumRuns.find(currentlyRunning)->second << "\n";
+            cout << "Number of Runs:   " << sortingAlgoToNumRuns.find(currentlyRunning)->second << "\n";
+            if(currentlyRunning != SortingType::DUMMYLAST){
+                long avgRuntime = sortingAlgoToTime.find(currentlyRunning)->second / sortingAlgoToNumRuns.find(currentlyRunning)->second;
+                cout << "Average run time: " << avgRuntime << " ns\n";
+            } 
 
             comparisonCount = 0;
             swapCount = 0;
@@ -343,6 +440,23 @@ public:
         }
 
         
+    }
+
+    void worstCase(){
+        for(uint i = 0; i < sortMe.size(); ++i){
+            sortMe.at(i) = (sortMe.size() -1) - i; 
+        }
+        cout << "Worst case: ";
+        printArrayAndStats(false);
+
+    }
+
+    void bestCase(){
+        for(uint i = 0; i < sortMe.size(); ++i){
+            sortMe.at(i) = i; 
+        }
+        cout << "Best case: ";
+        printArrayAndStats(false);
     }
 
     bool isSorted(){
@@ -359,10 +473,12 @@ private:
     uint comparisonCount ;
     uint swapCount;
     uint memWrites;
-    //std::chrono::time_point<std::chrono::system_clock> startTime;
-    //std::chrono::time_point<std::chrono::system_clock> endTime;
-    //std::chrono::duration<double> elapsedSeconds; 
-              
+    std::chrono::time_point<std::chrono::system_clock> startTime;
+    std::chrono::time_point<std::chrono::system_clock> endTime; 
+    unordered_map<SortingType, long> sortingAlgoToTime; //the type of sorting algorithm to the cumilive time each run in nanoseconds
+    unordered_map<SortingType, uint> sortingAlgoToNumRuns;     
+    enum SortingType currentlyRunning ;      
+    uint sampleSize;   
 
     void swapPos(int pos1, int pos2){
         T save = this->sortMe.at(pos1);
@@ -501,6 +617,41 @@ private:
         }
 
         return availableSlotIdx-1;
+
+    }
+
+    void init(){
+        for(int i = SortingType::BASE; i != SortingType::DUMMYLAST; ++i){
+            sortingAlgoToNumRuns.insert({(SortingType)i, 0});
+            sortingAlgoToTime.insert({(SortingType)i, 0});
+        }
+
+        
+        for(uint i = 0; i < sampleSize; ++i){
+            startTime = std::chrono::high_resolution_clock::now();
+            for(uint i = 0; i < originalOrderArray.size(); ++i) ;
+            endTime = std::chrono::high_resolution_clock::now();
+
+            sortingAlgoToNumRuns.find(SortingType::BASE)->second++;
+            sortingAlgoToTime.find(SortingType::BASE)->second += std::chrono::duration_cast<std::chrono::nanoseconds>(endTime-startTime).count();
+        }
+
+
+        
+        for(uint i = 0; i < sampleSize; ++i){
+            startTime = std::chrono::high_resolution_clock::now();
+            for(uint i = 0; i < originalOrderArray.size()/2; ++i) ;
+            endTime = std::chrono::high_resolution_clock::now();
+
+            sortingAlgoToNumRuns.find(SortingType::BASEHALF)->second++;
+            sortingAlgoToTime.find(SortingType::BASEHALF)->second += std::chrono::duration_cast<std::chrono::nanoseconds>(endTime-startTime).count();
+        }
+
+        long avgRuntimeLinear = sortingAlgoToTime.find(SortingType::BASE)->second / sortingAlgoToNumRuns.find(SortingType::BASE)->second;
+        long avgRuntimelog = sortingAlgoToTime.find(SortingType::BASEHALF)->second / sortingAlgoToNumRuns.find(SortingType::BASEHALF)->second;
+        cout << "Average runtime of a liner run: " << avgRuntimeLinear << " ns\n";
+        cout << "Average runtime of a log run: " << avgRuntimelog << " ns\n";
+
 
     }
 };
