@@ -53,17 +53,17 @@ When using this resource it is best to start with going over some core concepts 
 - [x] [Arrays and Strings](ds-algos/data-structures/arrays-strings/README.md)
 - [x] [Lists](ds-algos/data-structures/lists/README.md)
 - [x] [Stacks and Queues](ds-algos/data-structures/stacks-queues/README.md)
-- [ ] [Graphs and Trees]()
+- [X] [Graphs and Trees](ds-algos/data-structures/graphs-trees/README.md)
 - [ ] [Maps and Sets]()
 
 ### Algorithms
 
 #### Sorting
-- [ ] [Insertion Sort]()
-- [ ] [Selection Sort]()
-- [ ] [Bubble Sort]()
-- [ ] [Merge Sort]()
-- [ ] [Quick Sort]()
+- [X] [Insertion Sort]()
+- [X] [Selection Sort]()
+- [X] [Bubble Sort]()
+- [X] [Merge Sort]()
+- [X] [Quick Sort]()
 - [ ] [Heap Sort]()
 - [ ] [Topological Sort]()
 
