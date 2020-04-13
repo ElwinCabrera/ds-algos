@@ -1,19 +1,10 @@
 #ifndef TREES_AVL_TREE_H
 #define TREES_AVL_TREE_H
 
-
+#include "nodes.h"
 #include <vector>
 using std::vector;
 
-template<typename Type>
-class BinaryNode{
-public:
-    BinaryNode(): left(nullptr), right(nullptr) {}
-    BinaryNode(Type t): data(t), left(nullptr), right(nullptr) {}
-    Type data;
-    BinaryNode *left;
-    BinaryNode *right;
-};
 
 template<typename Type>
 class AVLTree{

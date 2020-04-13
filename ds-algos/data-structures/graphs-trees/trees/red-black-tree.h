@@ -4,24 +4,12 @@
 #include <queue>
 #include <vector>
 #include <iostream>
+#include "nodes.h"
 using std::queue;
 using std::cout;
 using std::vector;
 
-enum Color {RED, BLACK, DOUBLEBLACK};
 
-template<typename Type>
-class BinaryNode{
-public:
-    BinaryNode(): left(nullptr), right(nullptr), parent(nullptr), color(Color::RED) {}
-    BinaryNode(Type t): data(t), left(nullptr), right(nullptr), parent(nullptr), color(Color::RED) {}
-    Type data;
-    BinaryNode *left;
-    BinaryNode *right;
-    BinaryNode *parent;
-    Color color;
-
-};
 
 template<typename Type>
 class RedBlackTree{
