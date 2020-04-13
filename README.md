@@ -64,6 +64,7 @@ When using this resource it is best to start with going over some core concepts 
 - [X] [Bubble Sort]()
 - [X] [Merge Sort]()
 - [X] [Quick Sort]()
+- [X] [Counting Sort]()
 - [ ] [Heap Sort]()
 - [ ] [Topological Sort]()
 
