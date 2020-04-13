@@ -27,7 +27,14 @@ public:
     }
 
     bool search(string word){
-
+        TrieNode *tNode = root;
+        for(char c: word){
+            if(tNode->children.find(c) == tNode->children.end()){
+                return false;
+            }
+            tNode = tNode->children.find(c)->second;
+        }
+        return tNode->isWord;
     }
 
     void remove(string word){
