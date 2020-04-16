@@ -59,14 +59,15 @@ When using this resource it is best to start with going over some core concepts 
 ### Algorithms
 
 #### Sorting
-- [X] [Insertion Sort]()
-- [X] [Selection Sort]()
-- [X] [Bubble Sort]()
-- [X] [Merge Sort]()
-- [X] [Quick Sort]()
-- [X] [Counting Sort]()
-- [ ] [Heap Sort]()
-- [ ] [Topological Sort]()
+- [X] [Insertion Sort](ds-algos/algorithms/sorting/README.md)
+- [X] [Selection Sort](ds-algos/algorithms/sorting/README.md)
+- [X] [Bubble Sort](ds-algos/algorithms/sorting/README.md)
+- [X] [Merge Sort](ds-algos/algorithms/sorting/README.md)
+- [X] [Quick Sort](ds-algos/algorithms/sorting/README.md)
+- [X] [Counting Sort](ds-algos/algorithms/sorting/README.md)
+- [X] [Heap Sort](ds-algos/algorithms/sorting/README.md)
+- [X] [Bucket Sort](ds-algos/algorithms/sorting/README.md)
+- [ ] [Topological Sort](ds-algos/algorithms/sorting/README.md)
 
 #### Searching 
 - [ ] [Linear Search]()

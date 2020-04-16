@@ -33,6 +33,7 @@
 #include <set>
 #include <chrono>
 #include <unordered_map>
+#include "../../data-structures/graphs-trees/trees/max-heap.h"
 using std::vector;
 using std::cout;
 using std::set;
@@ -279,10 +280,18 @@ public:
     }
 
     vector<T> heapSort(){
+        //could use make_heap
+        MaxHeap<T> heap(sortMe.size());  // this data structure uses extra memory (usually heapsort wont use any extra memory)
+        for(T t: sortMe){
+            heap.insert(t);
+        }
+        for(uint i = sortMe.size()-1; i >=0; --i){
+            sortMe.at(i) = heap.extractMax();
+        }
 
     }
 
-    //This will only work with numbers
+    //This will only work with whole numbers
     vector<T> countingSort(){
         currentlyRunning = SortingType::COUNTINGSORT;
         if(sortingAlgoToNumRuns.find(SortingType::COUNTINGSORT)->second == 0){
@@ -327,8 +336,22 @@ public:
 
     }
 
-    vector<T> bucketSort(){
-
+    vector<float> bucketSort(){
+        //works only for floating point numbers uniformly distributed (0.0 - 1.0)
+        vector<vector<float>> buckets(sortMe.size());
+        for(float f: sortMe){
+            buckets.at(sortMe.size() * f).push_back(f);
+        }
+        for(vector<float> v: buckets){
+            std::sort(v.begin(), v.end());
+            //insertionSort(); // you can also use insertion sort as it might be more effective
+        }
+        uint idx = 0;
+        for(vector<float> v: buckets){
+            for(float f : v){
+                sortMe.at(idx++) = f;
+            }
+        }
     }
 
 
