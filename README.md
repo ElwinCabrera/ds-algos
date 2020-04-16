@@ -66,7 +66,7 @@ When using this resource it is best to start with going over some core concepts 
 - [X] [Quick Sort](ds-algos/algorithms/sorting/README.md)
 - [X] [Counting Sort](ds-algos/algorithms/sorting/README.md)
 - [X] [Heap Sort](ds-algos/algorithms/sorting/README.md)
-- [X] [Bucket Sort](ds-algos/algorithms/sorting/README.md)
+- [X] [Bucket Sort](ds-algos/algorithms/sorting/README.md)  
 - [ ] [Topological Sort](ds-algos/algorithms/sorting/README.md)
 
 #### Searching 
